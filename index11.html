@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Honk -->                      <link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
+<!-- Aref Ruqaa Ink -->            <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
+<!-- Atkinson Hyperlegible Next --><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<!-- Long Cang -->                 <link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined --> <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<!-- Launch full-screen from Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- Home-screen icon (iOS) -->
+<link rel="apple-touch-icon" href="/F814BB62-C0FA-4434-A9AE-198313FD8CA4.png">
+<!-- Browser favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<!-- (optional PNG favicon for modern browsers) -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<!-- 4. Theme-color (always black) -->
+<meta name="theme-color" content="#000000">
+
+<title>website</title>
+
+<style>
+
+/* === VARIABLES & GLOBALS === */
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+body {
+  background: #2b2b2b;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
+  font-size: 0.8rem;
+  color: #fff;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+body img {
+  display: block;
+  width: 100%;
+}
+
+/* === RESET / BASE === */
+p {
+  margin: 0.3rem auto;
+}
+
+button {
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  line-height: inherit;
+  background-color: #464646;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 0.35rem;
+}
+
+button:hover {
+  background-color: #444;
+  transform: translateY(0.2rem);
+}
+
+button:active {
+  background-color: #0f0;
+  transform: translateY(0);
+}
+
+button:focus {
+  outline: none;
+  background-color: #0ff;
+  transform: translateY(0.2rem);
+}
+
+/* === LAYOUT === */
+.pageBox, .history {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.splitView {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.sliderBox {
+  width: 100%;
+}
+
+/* === COMPONENTS === */
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  flex: 1;
+  line-height: 0.5rem;
+  font-size: 0.5rem;
+}
+
+.photoFrame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #464646;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.photoFrame img {
+  border-radius: 0.2rem;
+}
+
+/* === TYPOGRAPHY === */
+.hanBig {
+  transform: scaleY(1.7);
+  font-family: "Long Cang", serif;
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hanHalf {
+  transform: scaleY(1.0);
+  font-family: "Long Cang", serif;
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tiny {
+  font-size: 0.5rem;
+  word-spacing: 0.01rem;
+  line-height: 0.2;
+}
+
+.header {
+  font-size: 5rem;
+  line-height: 0.59;
+  font-family: "Honk", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 1.4rem;
+}
+
+/* === FORM CONTROLS === */
+input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background-size: 300% 100%;
+  height: 0.2rem;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  width: 2rem;
+  height: 1.5rem;
+  background: #fff;
+  border-radius: 10%;
+  cursor: pointer;
+  margin-top: -0.65rem;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0.5rem #fff;
+}
+
+/* === VENDOR OVERRIDES === */
+#protoanSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+#longConeSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
+}
+
+#wbSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #03d, #fff, #f10);
+}
+
+/* === ID RULES / ONE-OFFS === */
+#mainImgBox {
+  width: 100%;
+}
+
+/*#mainImg { width: 100; }*/  /* left intentionally commented out */
+
+</style>
+</head>
+<body>
+
+<div class="pageBox">
+  <div class="header splitView">
+    <p id="protoanHueVal">120°</p>
+    <p id="longConeHueVal">0°</p>
+    <p id="whiteBalanceVal">+0%</p>
+  </div>
+  <div class="sliderBox">
+    <input id="longConeSlider" type="range" min="-180" value="0" max="179">
+  </div>
+  <div id="mainImgBox">
+    <img id="mainImg" alt="Main Image" src="mosaic.svg">
+  </div>
+  <div class="sliderBox">
+    <input id="protoanSlider" type="range" min="0" value="120" max="359">
+  </div>
+  <div id="buttonBox" class="splitView">
+    <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
+    <input type="file"
+           id="fileInput"
+           accept="image/*"
+           style="display: none;">
+    <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
+    <div id="buttonGroup">
+      <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
+      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>GB</button>
+      <button id="btnB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>B</button>
+    </div>
+    <button id="btnInfo" class="button"><span class="material-symbols-outlined">pageview</span><br>Info</button>
+    <button id="btnSave" class="button"><span class="material-symbols-outlined">download</span><br>Save</button>
+  </div>
+  <div class="sliderBox">
+    <input id="wbSlider" type="range" min="-100" value="0" max="100">
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="originalImg" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Original</p>
+    </div>
+    <div class="photoFrame">
+      <img id="afterWB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>After White Balance</p>
+    </div>
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="monoR" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Red</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoG" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Green</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Blue</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoGB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Green+Blue</p>
+    </div>
+  </div>
+  <div>
+    <p>Select sample image:</p>
+    <div class="splitView">
+      <div id="mosaicBox" class="photoFrame">
+        <img id="mosaic" alt="mosaic" src="mosaic.svg">
+        <!--<p></p>-->
+      </div>
+      <div id="colorCheckerBox" class="photoFrame">
+        <img id="colorCheckerImg" alt="colorChecker" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+        <p>Checker</p>
+      </div>
+      <div id="colorBarsBox" class="photoFrame">
+        <img id="colorBarsImg" alt="colorBars" src="11171312-50DE-405F-A04F-979B560059E9.png">
+        <p>Bars</p>
+      </div>
+      <div id="yosemiteBox" class="photoFrame">
+        <img id="yosemiteImg" alt="yosemite cc-by Mikhail Kalugin" src="966F7B0B-E7F5-4C4C-9387-A050E10DB83F.jpeg">
+        <p>Yosemite<span class="tiny"> CC-BY Mikhail Kalugin</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="history">
+    <div class="photoFrame">
+      <img id="" alt="tollSea" loading="lazy" src="technicolor_tollsea_1922.jpg">
+      <p>The Toll of the Sea, 1922</p>
+      <p>Anna May Wong <span class="tiny">（竖排）</span><span class="hanBig">霜</span><span class="hanHalf">柳</span><span class="hanBig">黄</span><br><span style="padding-right: 8ch">and Kenneth Harlan</span></p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="phantom" loading="lazy" src="technicolor_phantom_1925.jpg">
+      <p>The Phantom of the Opera, 1925</p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="bride" loading="lazy" src="technicolor_bride_1930.jpg">
+      <p>Bride of the Regiment, 1930</p>
+      <p>Myrna Loy and Walter Pidgeon</p>
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+
+let btnInfo = false;
+  document.getElementById("btnInfo").addEventListener("click", function() {
+    btnInfo = !btnInfo;
+    console.log(btnInfo ? "info is ON" : "info is OFF");
+    if (btnInfo) {
+      this.style.backgroundColor = "#d4d4d4";
+      this.style.color = "#000";
+      this.style.boxShadow = "0 0 0.5rem #fff";
+    } else {
+      this.style.backgroundColor = "#464646";
+      this.style.color = "#fff";
+      this.style.boxShadow = "0 0 0rem #f0f";
+    }
+  });
+
+
+// 1. Keep track of state and grab elements
+let btnWB = false;
+const wbButton = document.getElementById("btnWB");
+const wbSlider = document.getElementById("wbSlider");
+// 2. Encapsulate all “on/off” styling in one place
+function setWB(on) {
+  btnWB = on;
+  if (btnWB) {
+    wbButton.style.backgroundColor = "#d4d4d4";
+    wbButton.style.color           = "#000";
+    wbButton.style.boxShadow       = "0 0 0.5rem #fff";
+  } else {
+    wbButton.style.backgroundColor = "#464646";
+    wbButton.style.color           = "#fff";
+    wbButton.style.boxShadow       = "0 0 0rem #f0f";
+  }
+}
+// 3. Button click toggles
+wbButton.addEventListener("click", () => {
+  setWB(!btnWB);
+  console.log(btnWB ? "Button is ON" : "Button is OFF");
+});
+// 4. Slider movement always turns WB “on”
+wbSlider.addEventListener("input", () => {
+  if (!btnWB) {
+    setWB(true);
+    console.log("WB Button turned ON by slider");
+  }
+  // └ if want “zero” to turn it off again:
+  // if (wbSlider.value == 0) setWB(false);
+});
+
+
+// JS (at the bottom of <script> block)
+const uploadBtn = document.getElementById("btnUpload");
+const fileInput = document.getElementById("fileInput");
+const mainImg   = document.getElementById("mainImg");
+// When “Upload” is clicked, open file picker:
+uploadBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+// When a file is chosen, set it as the main image:
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  mainImg.src = URL.createObjectURL(file);
+});
+
+
+
+// ramdom box shadows:
+function getRandomColor() {return '#' + Math.floor(Math.random() * 16777215).toString(16);}
+function applyRandomBoxShadows() {const allElements = document.querySelectorAll('*');allElements.forEach(el => {const color = getRandomColor();el.style.boxShadow = `0 0 0 1px ${color}`;});}
+// applyRandomBoxShadows(); // Apply on page load
+
+</script>
+</html>

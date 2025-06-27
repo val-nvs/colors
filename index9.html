@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
+
+<link rel="icon" type="image/png" href="/F814BB62-C0FA-4434-A9AE-198313FD8CA4.png">
+<link rel="apple-touch-icon" href="/F814BB62-C0FA-4434-A9AE-198313FD8CA4.png">
+<title>website</title>
+
+<style>
+
+:root {
+      --protoanHue: 30deg;
+      --protoanColor: rgb(255,128,0);
+      --longConeHue: 180deg;
+      --longConeColor: rgb(0,255,255);
+    }
+
+@keyframes morph {
+  0% { font-variation-settings: "MORF" 10;}
+  100%{font-variation-settings: "MORF" 15;} }
+@keyframes morph0 {
+  0% { font-variation-settings: "MORF" 15;}
+  100%{font-variation-settings: "MORF" 10;} }
+
+@keyframes slide {
+  20% {transform: translateX(0);}
+  40% {transform: translateX(1rem);}
+  60% {transform: translateX(0);}
+  80% {transform: translateX(-1rem);}
+  100% {transform: translateX(0);} }
+  
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%;}
+    25%  { background-position: 50% 100%;}
+    50%  { background-position: 100% 50%;}
+    75%  { background-position: 50% 0%;}
+    100% { background-position: 0% 50%;} }
+
+/*font-family: "Arial", "Verdana", "Helvetica", sans-serif, etc. */
+/*font-size: px, em, rem, %, vh, vw */
+/*font-style: normal, italic, oblique */
+/*font-weight: normal, bold, 100-900 */
+/*font-variant: normal, small-caps */
+/*font-stretch: normal, condensed, expanded, <percentage> */
+/*line-height: normal, <number>, <length>, <percentage> */
+/*letter-spacing: normal, <length> */
+/*word-spacing: normal, <length> */
+/*text-transform: none, capitalize, uppercase, lowercase */
+/*text-decoration: none, underline, overline, line-through */
+/*vertical-align: baseline, sub, super, top, middle, bottom */
+/*text-shadow: <horizontal-offset> <vertical-offset> <blur-radius> <color> */
+/*white-space: normal, nowrap, pre, pre-wrap, pre-line */
+/*overflow: visible, hidden, scroll, auto */
+/*direction: ltr, rtl */
+/*writing-mode: horizontal-tb, vertical-rl, vertical-lr */
+/*word-break: normal, break-word, keep-all */
+/*white-space-collapse: collapse, preserve */
+/*hyphens: none, manual, auto */
+/*font-kerning: auto, normal, none */
+/*font-feature-settings: <name> <value> */
+/*font-size-adjust: none, <number> */
+/*-webkit-font-smoothing: antialiased, subpixel-antialiased */
+/*text-justify: auto, inter-word, inter-character */
+/*color: color name, hex, rgb(), rgba(), hsl(), hsla() */
+/*word-wrap: normal, break-word */
+
+
+
+* {
+  color:#eee;
+  text-shadow: 0 0 2px #000;
+  text-size: 0.8;
+}
+p {margin: 0.3rem auto;}
+  
+body {
+  background: #000;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
+  }
+
+#pageBox {
+  display:flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+  background: transparent;
+}
+
+.header {
+  width: 100%;
+  display:flex;
+  justify-content: space-between;
+}
+
+.sliderBox {
+  width: 100%;
+  background: transparent;
+}
+
+.sliderBox input {
+  width: 100%;
+  margin: 0; /*important */
+}
+
+#ehh::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  animation: gradientShift 5s ease;
+}
+#longConeSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
+}
+#wbSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #03d, #fff, #f10);
+}
+
+#imageBox img {
+  object-fit: cover; /* or contain */
+  display: block;
+  width: 100%;
+    box-shadow: 0 0 0.5rem #888;
+}
+
+#buttonBox {
+  display:flex;
+  justify-content: space-evenly;
+  width: 100%;
+}
+#buttonGroup {
+  display:flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.splitView {
+  display:flex;
+  justify-content: space-evenly;
+  gap: 0.4rem;
+}
+
+.photoFrame {
+  padding: 0rem;
+  border-radius: 0.25rem;
+  background: var(--longConeColor);
+  box-shadow: 0 0 0.15rem #fff;
+}
+.photoFrame img {
+  object-fit: cover;
+  display: block;
+  width:100%;
+  border-radius: 0.25rem;
+}
+.photoFrame p {
+  text-align: center;
+  line-height: 1rem;
+}
+
+.history p {
+  margin: 1rem;
+}
+
+.hanBig {
+  transform: scaleY(1.7);
+  font-family:"Long Cang", serif;
+  font-size: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hanHalf {
+  transform: scaleY(1.0);
+  font-family:"Long Cang", serif;
+  font-size: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+.tiny {
+  font-size: 0.4rem;
+}
+
+
+button {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin: 0rem; /*0*/
+  padding: 0.1rem 0.2rem; /*0*/
+  border: none; /*none*/
+  background: #f0f; /*none*/
+  font: inherit; /*inherit*/
+  color: #fff; /*inherit*/
+  line-height: inherit; /*inherit*/
+  cursor: pointer; /*pointer*/
+  font-size: inherit;
+  font-weight: inherit;
+  background-color: rgba(55,55,55,0.5); /* Primary button color */
+  border-radius: 0.2rem;
+  transition: all 0.1s ease;
+  box-shadow: 0 0 0.15rem #fff;
+}
+button:hover {
+  background-color: transparent; /* on hover */
+  transform: translateY(0.1rem); /* Slight lift effect */
+}
+button:active {
+  background-color: #0f0; /* on click */
+  transform: translateY(0); /* Button goes back to normal position */
+}
+button:focus {
+  outline: none;
+  background-color: #0ff; 
+  transform: translateX(0.2rem); /*  */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Focus outline */
+}
+
+input[type="range"] {
+  appearance: none;            /* Standard reset */
+  -webkit-appearance: none;    /* Remove default WebKit (Safari, Chrome) styles */
+  -moz-appearance: none;       /* Remove default Firefox styles */
+  width: inherit;                 /* Default width */
+  height: 0.8rem;                /* Default height */
+  background: transparent;            /* Default background color */
+  position: relative;
+}
+input[type="range"]::-webkit-slider-thumb {
+  animation: slide 1s;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2rem;
+  height: 1.5rem;
+  background: #fff;            /* Default thumb color */
+  border-radius: 0.2rem;
+  cursor: pointer;            /* Default pointer cursor */
+  position: relative;     /* Use absolute positioning */
+  top: 50%;               /* Position thumb vertically at 50% of track height */
+  transform: translateY(-50%);  /* This moves the thumb up by 50% of its height, centering it */
+  box-shadow: 0 0 0.15rem #fff;
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  background: #00f;  /* Darker color when active (dragging) */
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: #555;  /* Slightly lighter when hovered */
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background-size: 300% 100%;
+  height: 0.2rem;
+  box-shadow: 0 0 0.15rem #fff;
+}
+
+
+html, body {
+  margin:0;
+  height:100%;
+  position:relative; }
+p#dispProtoan {
+  position:absolute;
+  top:100px; left:50px; }
+input#protoanSlider {
+  position:absolute;
+  top:200px; left:10px;
+  width:300px; }
+svg#connector {
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index: 888; }
+line {
+  stroke:red; stroke-width:2; }
+
+
+
+</style></head><body>
+
+  <svg id="connector">
+    <line id="line" x1="0" y1="0" x2="0" y2="0"/>
+  </svg>
+
+<div id="pageBox">
+  <div class="header">
+    <p id="dispProtoan">a</p>
+    <p id="dispLongCone">b</p>
+  </div>
+  <div class="sliderBox">
+    <input id="longConeSlider" type="range" min="-180" value="0" max="180">
+  </div>
+  <div id="imageBox">
+    <img id="mainImg" alt="Main Image" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+  </div>
+  <div class="sliderBox">
+    <input id="protoanSlider" type="range" min="0" value="120" max="360">
+  </div>
+  <div id="buttonBox">
+    <button id="btnUpload" class="button">Upload</button>
+    <button id="btnWB" class="button">WB</button>
+    <div id="buttonGroup">
+      <button id="btnG" class="button">G</button>
+      <button id="btnB" class="button">B</button>
+      <button id="btnGB" class="button">G+B</button>
+    </div>
+    <button id="btnSave" class="button">Save</button>
+    <button id="btnInfo" class="button">Info</button>
+  </div>
+  <div class="sliderBox">
+    <input id="wbSlider" type="range" min="-100" value="0" max="100">
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="originalImg" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Original</p>
+    </div>
+    <div class="photoFrame">
+      <img id="afterWB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>After White Balance</p>
+    </div>
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="monoR" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Red</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoG" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Green</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Blue</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoGB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Green+Blue</p>
+    </div>
+  </div>
+  <p>Select sample image:</p>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="colorChecker" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <p>Checker</p>
+    </div>
+    <div class="photoFrame">
+      <img id="colorBars" alt="" src="11171312-50DE-405F-A04F-979B560059E9.png">
+      <p>Bars</p>
+    </div>
+    <div class="photoFrame">
+      <img id="colorCircle" alt="" src="19F9E437-99BD-4312-A09F-094AEA2034B9.jpeg">
+      <p>Circle</p>
+    </div>
+    <div class="photoFrame">
+      <img id="colorTest" alt="" src="11171312-50DE-405F-A04F-979B560059E9.png">
+      <p>Test</p>
+    </div>
+  </div>
+  <div class="history">
+    <div class="photoFrame">
+      <img id="" alt="" src="B07215AE-6C65-48D1-BE46-5BFD81D0C601.jpeg">
+      <p>The Toll of the Sea, 1922</p>
+      <p>Anna May Wong <span class="tiny">（竖排）</span><span class="hanBig">霜</span><span class="hanHalf">柳</span><span class="hanBig">黄</span><br><span style="padding-right: 8ch">and Kenneth Harlan</span></p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="" src="99E75FE1-7E71-41D5-AB2B-FE2E9FF1DE20.jpeg">
+      <p>The Phantom of the Opera, 1925</p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="" src="C719662D-4729-4199-B402-E161AAF60E57.jpeg">
+      <p>Bride of the Regiment, 1930</p>
+      <p>Myrna Loy and Walter Pidgeon</p>
+    </div>
+  </div>
+  <button id="btnDebug" class="button">debug</button>
+</div>
+
+<input type="range" id="slider1" min="0" max="359" value="0">
+<div id="display1" class="colorBox">Hue 1: 0°</div>
+<input type="range" id="slider2" min="0" max="359" value="0">
+<div id="display2" class="colorBox">Hue 2: 0°</div>
+
+</body>
+
+<script>
+
+
+let btnWB = false;
+  document.getElementById("btnWB").addEventListener("click", function() {
+    btnWB = !btnWB;
+    console.log(btnWB ? "Button is ON" : "Button is OFF");
+    if (btnWB) {
+      this.style.backgroundColor = "#fff";
+    } else {
+      this.style.backgroundColor = "";
+    }
+  });
+
+
+let btnDebug = false;
+  document.getElementById("btnDebug").addEventListener("click", function() {
+    btnDebug = !btnDebug;
+    console.log(btnDebug ? "Button is ON" : "Button is OFF");
+    if (btnDebug) {
+      this.style.backgroundColor = "#fff";
+    } else {
+      this.style.backgroundColor = "";
+      //el.style.boxShadow = `0 0 0 0px transparent`;
+    }
+  });
+
+//
+
+
+
+
+
+
+
+    // hue → RGB string function:
+    function hueToRgb(h) {
+      h = ((h % 360) + 360) % 360;
+      const c = 1;
+      const x = 1 - Math.abs((h/60) % 2 - 1);
+      let r1, g1, b1;
+      if      (h < 60)  [r1, g1, b1] = [c, x, 0];
+      else if (h < 120) [r1, g1, b1] = [x, c, 0];
+      else if (h < 180) [r1, g1, b1] = [0, c, x];
+      else if (h < 240) [r1, g1, b1] = [0, x, c];
+      else if (h < 300) [r1, g1, b1] = [x, 0, c];
+      else              [r1, g1, b1] = [c, 0, x];
+      return `rgb(${Math.round(r1*255)}, ${Math.round(g1*255)}, ${Math.round(b1*255)})`;
+    }
+
+    //
+    const protoanSlider = document.getElementById('protoanSlider');
+    const dispProtoan = document.getElementById('dispProtoan');
+    protoanSlider.addEventListener('input', () => {
+      const hue = protoanSlider.value;
+      const col = hueToRgb(hue);
+      dispProtoan.style.backgroundColor = col;
+      dispProtoan.textContent = `Hue 1: ${hue}°`;
+    });
+    protoanSlider.dispatchEvent(new Event('input')); // initialize
+
+const slider = document.getElementById('longConeSlider');
+slider.addEventListener('input', () => {
+  const hue   = +slider.value;
+  const color = hueToRgb(hue);
+  document.documentElement.style.setProperty('--longConeHue',   `${hue}deg`);
+  document.documentElement.style.setProperty('--longConeColor',  color);
+});
+
+slider.dispatchEvent(new Event('input'));
+
+
+    //
+    const longConeSlider = document.getElementById('longConeSlider');
+    const dispLongCone = document.getElementById('dispLongCone');
+    longConeSlider.addEventListener('input', () => {
+      const hue = longConeSlider.value;
+      const col = hueToRgb(hue);
+      dispLongCone.style.backgroundColor = col;
+      dispLongCone.textContent = `Hue 2: ${hue}°`;
+    });
+    longConeSlider.dispatchEvent(new Event('input')); // initialize
+
+const slider = document.getElementById('longConeSlider');
+slider.addEventListener('input', () => {
+  const hue   = +slider.value;
+  const color = hueToRgb(hue);
+  document.documentElement.style.setProperty('--longConeHue',   `${hue}deg`);
+  document.documentElement.style.setProperty('--longConeColor',  color);
+});
+
+slider.dispatchEvent(new Event('input'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      function getRandomColor() {
+        return '#' + Math.floor(Math.random() * 16777215).toString(16);
+      }
+      function applyRandomBoxShadows() {
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+          const color = getRandomColor();
+          el.style.boxShadow = `0 0 0 1px ${color}`;
+      });
+      }
+
+  applyRandomBoxShadows(); // Apply on page load
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    const conn_p      = document.getElementById('dispProtoan');
+    const conn_protoanSlider = document.getElementById('protoanSlider');
+    const conn_line   = document.getElementById('line');
+
+    function conn_update() {
+      const conn_pr = conn_p.getBoundingClientRect();
+      const conn_sr = conn_protoanSlider.getBoundingClientRect();
+      const conn_t  = (conn_protoanSlider.value - conn_protoanSlider.min) 
+                      / (conn_protoanSlider.max - conn_protoanSlider.min);
+
+      const conn_x1 = conn_pr.left + conn_pr.width  / 2;
+      const conn_y1 = conn_pr.top  + conn_pr.height / 2;
+      const conn_x2 = conn_sr.left + conn_t * conn_sr.width;
+      const conn_y2 = conn_sr.top  + conn_sr.height / 2;
+
+      conn_line.setAttribute('x1', conn_x1);
+      conn_line.setAttribute('y1', conn_y1);
+      conn_line.setAttribute('x2', conn_x2);
+      conn_line.setAttribute('y2', conn_y2);
+    }
+
+    conn_protoanSlider.addEventListener('input',  conn_update);
+    window.addEventListener('resize', conn_update);
+    conn_update();
+
+
+
+
+
+
+</script>
+
+</html>
