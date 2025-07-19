@@ -33,7 +33,7 @@
 </head>
 <body>
   <div id="controls">
-    <input id="hueL" type="range" min="0" max="359" value="0">
+    <input id="hueL" type="range" min="-179" max="180" value="0">
     <span id="hueLval">0°</span>
     <input id="hueM" type="range" min="0" max="359" value="180">
     <span id="hueMval">180°</span>
@@ -83,16 +83,18 @@
       function computeOverlays() {
         const rawL = +hueLInput.value;
         const rawM = +hueMInput.value;
+        const hueL = ((rawL % 360) + 360) % 360; // Wrap to [0–359]
+
         // map rawM [0,359] → delta [120,240]
         const t = rawM / 359;                 // [0,1]
         const delta = 120 + t * 120;          // [120,240]
-        const effM = (rawL + delta) % 360;    // effective second hue
+        const effM = (hueL + delta) % 360;    // effective second hue
 
         // update labels
-        hueLVal.textContent = rawL + '°';
+        hueLVal.textContent = hueL + '°';
         hueMVal.textContent = (effM.toFixed(0)) + '°';
 
-        const oL = normalize255(hsv2rgb(rawL,1,1));
+        const oL = normalize255(hsv2rgb(hueL,1,1));
         const oM = normalize255(hsv2rgb(effM,1,1));
         const rawS = {
           r: Math.max(0,255 - oL.r - oM.r),
