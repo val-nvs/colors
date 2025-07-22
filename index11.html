@@ -182,6 +182,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;  /* ADD THIS LINE */
   width: 2rem;
   height: 1.5rem;
   background: #fff;
@@ -254,29 +255,29 @@ input[type="range"]:hover::-webkit-slider-thumb {
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="originalImg" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="originalImg" alt="" src="checker.jpg">
       <p>Original</p>
     </div>
     <div class="photoFrame">
-      <img id="afterWB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="afterWB" alt="" src="checker.jpg">
       <p>After White Balance</p>
     </div>
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="monoR" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="monoR" alt="" src="checker.jpg">
       <p>Red</p>
     </div>
     <div class="photoFrame">
-      <img id="monoG" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="monoG" alt="" src="checker.jpg">
       <p>Green</p>
     </div>
     <div class="photoFrame">
-      <img id="monoB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="monoB" alt="" src="checker.jpg">
       <p>Blue</p>
     </div>
     <div class="photoFrame">
-      <img id="monoGB" alt="" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+      <img id="monoGB" alt="" src="checker.jpg">
       <p>Green+Blue</p>
     </div>
   </div>
@@ -288,15 +289,15 @@ input[type="range"]:hover::-webkit-slider-thumb {
         <!--<p></p>-->
       </div>
       <div id="colorCheckerBox" class="photoFrame">
-        <img id="colorCheckerImg" alt="colorChecker" src="268D6124-F132-439F-8435-2221421CCA87.jpeg">
+        <img id="colorCheckerImg" alt="colorChecker" src="checker.jpg">
         <p>Checker</p>
       </div>
       <div id="colorBarsBox" class="photoFrame">
-        <img id="colorBarsImg" alt="colorBars" src="11171312-50DE-405F-A04F-979B560059E9.png">
+        <img id="colorBarsImg" alt="colorBars" src="color_bars.png">
         <p>Bars</p>
       </div>
       <div id="yosemiteBox" class="photoFrame">
-        <img id="yosemiteImg" alt="yosemite cc-by Mikhail Kalugin" src="966F7B0B-E7F5-4C4C-9387-A050E10DB83F.jpeg">
+        <img id="yosemiteImg" alt="yosemite cc-by Mikhail Kalugin" src="yosemite.jpg">
         <p>Yosemite<span class="tiny"> CC-BY Mikhail Kalugin</span></p>
       </div>
     </div>
@@ -392,6 +393,86 @@ fileInput.addEventListener("change", e => {
 function getRandomColor() {return '#' + Math.floor(Math.random() * 16777215).toString(16);}
 function applyRandomBoxShadows() {const allElements = document.querySelectorAll('*');allElements.forEach(el => {const color = getRandomColor();el.style.boxShadow = `0 0 0 1px ${color}`;});}
 // applyRandomBoxShadows(); // Apply on page load
+
+
+// Utility to update displayed slider values
+function updateSliderLabels() {
+  document.getElementById("protoanHueVal").textContent = protoanSlider.value + "°";
+  document.getElementById("longConeHueVal").textContent = longConeSlider.value + "°";
+  document.getElementById("whiteBalanceVal").textContent = (wbSlider.value >= 0 ? "+" : "") + wbSlider.value + "%";
+}
+
+// Apply filters to main and preview images
+function applyFilters() {
+  const protoanHue = Number(protoanSlider.value);
+  const longConeHue = Number(longConeSlider.value);
+  const wbValue = Number(wbSlider.value);
+
+  // Map WB slider (-100 to 100) to brightness(0.5 to 1.5)
+  const brightness = 1 + wbValue / 200;
+
+  // Combine hue rotations (CSS allows one hue-rotate, so add them)
+  const totalHueRotate = (protoanHue + longConeHue) % 360;
+
+  // Filters for main image and afterWB
+  const filterMain = `hue-rotate(${totalHueRotate}deg) brightness(${brightness})`;
+
+  mainImg.style.filter = filterMain;
+  document.getElementById("afterWB").style.filter = filterMain;
+
+  // Filters for channel images:
+  // Red channel: Keep only red by zeroing green and blue via CSS filter
+  document.getElementById("monoR").style.filter = `brightness(${brightness}) sepia(1) saturate(10000%) hue-rotate(${totalHueRotate}deg)`;
+
+  // Green channel: isolate green by hue rotation + saturate + brightness
+  document.getElementById("monoG").style.filter = `brightness(${brightness}) sepia(1) saturate(10000%) hue-rotate(${totalHueRotate - 90}deg)`;
+
+  // Blue channel: isolate blue similarly
+  document.getElementById("monoB").style.filter = `brightness(${brightness}) sepia(1) saturate(10000%) hue-rotate(${totalHueRotate - 180}deg)`;
+
+  // Green+Blue channel (GB)
+  document.getElementById("monoGB").style.filter = `brightness(${brightness}) saturate(0) contrast(200%)`;
+
+  // Optional: original image has no filters
+  document.getElementById("originalImg").style.filter = "none";
+}
+
+// Update images on sliders change
+const protoanSlider = document.getElementById("protoanSlider");
+const longConeSlider = document.getElementById("longConeSlider");
+const wbSlider = document.getElementById("wbSlider");
+
+protoanSlider.addEventListener("input", () => {
+  updateSliderLabels();
+  applyFilters();
+});
+longConeSlider.addEventListener("input", () => {
+  updateSliderLabels();
+  applyFilters();
+});
+wbSlider.addEventListener("input", () => {
+  updateSliderLabels();
+  applyFilters();
+});
+
+// When user uploads a new image, update all preview images to show it
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+
+  mainImg.src = url;
+  document.getElementById("originalImg").src = url;
+  document.getElementById("afterWB").src = url;
+  document.getElementById("monoR").src = url;
+  document.getElementById("monoG").src = url;
+  document.getElementById("monoB").src = url;
+  document.getElementById("monoGB").src = url;
+});
+
+// Initialize labels and filters on page load
+updateSliderLabels();
+applyFilters();
 
 </script>
 </html>
