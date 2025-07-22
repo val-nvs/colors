@@ -5,21 +5,83 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Honk -->                      <link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
-<!-- Aref Ruqaa Ink -->            <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
-<!-- Atkinson Hyperlegible Next --><link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
-<!-- Long Cang -->                 <link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
-<!-- Material Symbols Outlined --> <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Honk -->
+<link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
+<!-- Aref Ruqaa Ink -->
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
+<!-- Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<!-- Long Cang -->
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<!-- Launch full-screen from Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- Home-screen icon (iOS) -->
+<link rel="apple-touch-icon" href="/F814BB62-C0FA-4434-A9AE-198313FD8CA4.png">
+<!-- Browser favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<!-- (optional PNG favicon for modern browsers) -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<!-- 4. Theme-color (always black) -->
+<meta name="theme-color" content="#000000">
 
 <title>Color Channel Filter</title>
 
 <style>
-
-/* === VARIABLES & GLOBALS === */
 html {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
+}
+
+.pageBox, .history {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.splitView {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.sliderBox {
+  width: 100%;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  flex: 1;
+}
+
+.photoFrame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #464646;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.photoFrame img {
+  border-radius: 0.2rem;
 }
 
 body {
@@ -31,14 +93,13 @@ body {
   margin: 0 auto;
 }
 
+p {
+  margin: 0.3rem auto;
+}
+
 body img {
   display: block;
   width: 100%;
-}
-
-/* === RESET / BASE === */
-p {
-  margin: 0.3rem auto;
 }
 
 button {
@@ -65,60 +126,49 @@ button:active {
 
 button:focus {
   outline: none;
-  background-color: #ff6b35;
+  background-color: #0ff;
   transform: translateY(0.2rem);
 }
 
-/* === LAYOUT === */
-.pageBox, .history {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 0.8rem;
+#protoanSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
 }
 
-.splitView {
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
+#longConeSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
+}
+
+#wbSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #03d, #fff, #f10);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
   width: 100%;
 }
 
-.sliderBox {
-  width: 100%;
+input[type="range"]::-webkit-slider-runnable-track {
+  background-size: 300% 100%;
+  height: 0.2rem;
 }
 
-/* === COMPONENTS === */
-.buttonGroup {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2rem;
+  height: 1.5rem;
+  background: #fff;
+  border-radius: 10%;
+  cursor: pointer;
+  margin-top: -0.65rem;
 }
 
-.button {
-  flex: 1;
-  line-height: 0.5rem;
-  font-size: 0.5rem;
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0.5rem #fff;
 }
 
-.photoFrame {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  background: #464646;
-  border-radius: 0.5rem;
-  text-align: center;
-}
-
-.photoFrame img {
-  border-radius: 0.2rem;
-}
-
-/* === TYPOGRAPHY === */
+/* text */
 .hanBig {
   transform: scaleY(1.7);
   font-family: "Long Cang", serif;
@@ -156,76 +206,50 @@ button:focus {
   font-size: 1.4rem;
 }
 
-/* === FORM CONTROLS === */
-input[type="range"] {
-  -webkit-appearance: none;
-  display: block;
-  width: 100%;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  background-size: 300% 100%;
-  height: 0.2rem;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 2rem;
-  height: 1.5rem;
-  background: #fff;
-  border-radius: 10%;
-  cursor: pointer;
-  margin-top: -0.65rem;
-}
-
-input[type="range"]:hover::-webkit-slider-thumb {
-  background: rgba(255,255,255,0.5);
-  box-shadow: 0 0 0.5rem #fff;
-}
-
-/* === VENDOR OVERRIDES === */
-#protoanSlider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
-}
-
-#longConeSlider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
-}
-
-#wbSlider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #03d, #fff, #f10);
-}
-
-/* === ID RULES / ONE-OFFS === */
 #mainImgBox {
   width: 100%;
 }
 
+.button {
+  line-height: 0.5rem;
+  font-size: 0.5rem;
+}
+
+/* Hidden canvas for processing */
+#processingCanvas {
+  display: none;
+}
+
+/* Cursor styling for sample images */
+.photoFrame {
+  cursor: pointer;
+}
+
+.photoFrame:hover {
+  background-color: #555;
+}
 </style>
 </head>
 <body>
 
 <div class="pageBox">
   <div class="header splitView">
-    <p id="protoanHueVal">120°</p>
+    <p id="protoanHueVal">180°</p>
     <p id="longConeHueVal">0°</p>
-    <p id="whiteBalanceVal">+0%</p>
+    <p id="whiteBalanceVal">±0 μ</p>
   </div>
   <div class="sliderBox">
     <input id="longConeSlider" type="range" min="-180" value="0" max="179">
   </div>
   <div id="mainImgBox">
-    <img id="mainImg" alt="Main Image" src="mosaic.svg">
+    <img id="mainImg" alt="Main Image" src="">
   </div>
   <div class="sliderBox">
-    <input id="protoanSlider" type="range" min="0" value="120" max="359">
+    <input id="protoanSlider" type="range" min="0" value="180" max="359">
   </div>
   <div id="buttonBox" class="splitView">
     <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
-    <input type="file"
-           id="fileInput"
-           accept="image/*"
-           style="display: none;">
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
     <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
     <div id="buttonGroup">
       <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
@@ -240,29 +264,29 @@ input[type="range"]:hover::-webkit-slider-thumb {
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="originalImg" alt="" src="checker.jpg">
+      <img id="originalImg" alt="" src="">
       <p>Original</p>
     </div>
     <div class="photoFrame">
-      <img id="afterWB" alt="" src="checker.jpg">
+      <img id="afterWB" alt="" src="">
       <p>After White Balance</p>
     </div>
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="monoR" alt="" src="checker.jpg">
+      <img id="monoR" alt="" src="">
       <p>Red</p>
     </div>
     <div class="photoFrame">
-      <img id="monoG" alt="" src="checker.jpg">
+      <img id="monoG" alt="" src="">
       <p>Green</p>
     </div>
     <div class="photoFrame">
-      <img id="monoB" alt="" src="checker.jpg">
+      <img id="monoB" alt="" src="">
       <p>Blue</p>
     </div>
     <div class="photoFrame">
-      <img id="monoGB" alt="" src="checker.jpg">
+      <img id="monoGB" alt="" src="">
       <p>Green+Blue</p>
     </div>
   </div>
@@ -270,7 +294,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <p>Select sample image:</p>
     <div class="splitView">
       <div id="mosaicBox" class="photoFrame">
-        <img id="mosaic" alt="mosaic" src="mosaic.svg">
+        <img id="mosaic" alt="mosaic" src="circle.jpg">
         <!--<p></p>-->
       </div>
       <div id="colorCheckerBox" class="photoFrame">
@@ -287,22 +311,163 @@ input[type="range"]:hover::-webkit-slider-thumb {
       </div>
     </div>
   </div>
+  <div class="history">
+    <div class="photoFrame">
+      <img id="" alt="tollSea" loading="lazy" src="technicolor_tollsea_1922.jpg">
+      <p>The Toll of the Sea, 1922</p>
+      <p>Anna May Wong <span class="tiny">（竖排）</span><span class="hanBig">霜</span><span class="hanHalf">柳</span><span class="hanBig">黄</span><br><span style="padding-right: 8ch">and Kenneth Harlan</span></p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="phantom" loading="lazy" src="technicolor_phantom_1925.jpg">
+      <p>The Phantom of the Opera, 1925</p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="bride" loading="lazy" src="technicolor_bride_1930.jpg">
+      <p>Bride of the Regiment, 1930</p>
+      <p>Myrna Loy and Walter Pidgeon</p>
+    </div>
+  </div>
 </div>
 
-<script>
+<!-- Hidden canvas for processing -->
+<canvas id="processingCanvas"></canvas>
 
-// Canvas-based image processing functions
-function createCanvas(img) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = img.naturalWidth || img.width;
-  canvas.height = img.naturalHeight || img.height;
-  ctx.drawImage(img, 0, 0);
-  return { canvas, ctx };
+<script>
+// Global variables
+let currentImageSrc = null;
+let btnInfo = false;
+let btnWB = false;
+
+// Helper functions from version 3
+function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+
+function kelvinToRgb(K) {
+  const t = K / 100;
+  let r, g, b;
+  if (t <= 66) {
+    r = 255;
+    g = 99.4708 * Math.log(t) - 161.1196;
+    b = t <= 19 ? 0 : 138.5177 * Math.log(t - 10) - 305.0448;
+  } else {
+    r = 329.6987 * Math.pow(t - 60, -0.1332);
+    g = 288.1222 * Math.pow(t - 60, -0.0755);
+    b = 255;
+  }
+  return { r: clamp(r), g: clamp(g), b: clamp(b) };
 }
 
-function extractColorChannel(img, channel) {
-  const { canvas, ctx } = createCanvas(img);
+function hsv2rgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s;
+  const hp = h / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (hp < 1) [r1, g1, b1] = [c, x, 0];
+  else if (hp < 2) [r1, g1, b1] = [x, c, 0];
+  else if (hp < 3) [r1, g1, b1] = [0, c, x];
+  else if (hp < 4) [r1, g1, b1] = [0, x, c];
+  else if (hp < 5) [r1, g1, b1] = [x, 0, c];
+  else [r1, g1, b1] = [c, 0, x];
+  const m = v - c;
+  return { r: (r1 + m) * 255, g: (g1 + m) * 255, b: (b1 + m) * 255 };
+}
+
+function normalize255(o) {
+  const s = o.r + o.g + o.b;
+  if (!s) return { r: 0, g: 0, b: 0 };
+  const f = 255 / s;
+  return { r: o.r * f, g: o.g * f, b: o.b * f };
+}
+
+function computeOverlays() {
+  const L = +document.getElementById('longConeSlider').value;
+  const M = +document.getElementById('protoanSlider').value;
+  const hueL = ((L % 360) + 360) % 360;
+  const delta = 120 + (M / 359) * 120;
+  const hueM = (hueL + delta) % 360;
+  
+  document.getElementById('longConeHueVal').textContent = hueL + '°';
+  document.getElementById('protoanHueVal').textContent = hueM.toFixed(0) + '°';
+  
+  const oL = normalize255(hsv2rgb(hueL, 1, 1));
+  const oM = normalize255(hsv2rgb(hueM, 1, 1));
+  const rawS = {
+    r: Math.max(0, 255 - oL.r - oM.r),
+    g: Math.max(0, 255 - oL.g - oM.g),
+    b: Math.max(0, 255 - oL.b - oM.b)
+  };
+  
+  return { oL, oM, oS: normalize255(rawS) };
+}
+
+// Canvas processing functions
+function processImage(imgSrc, targetImgId, processFunc) {
+  if (!imgSrc) return;
+  
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function() {
+    const canvas = document.getElementById('processingCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    
+    if (processFunc) {
+      processFunc(ctx, canvas);
+    }
+    
+    // Convert to data URL and set to target img
+    const dataUrl = canvas.toDataURL();
+    document.getElementById(targetImgId).src = dataUrl;
+  };
+  img.src = imgSrc;
+}
+
+// Processing functions
+function applyWhiteBalance(ctx, canvas) {
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500; // ≈154 μ
+  const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+  const Mt = M0 + deltaM;
+  const K = 1000000 / Mt;
+  
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+  
+  const rgb = kelvinToRgb(K);
+  const gR = rgb.r / 255, gG = rgb.g / 255, gB = rgb.b / 255;
+  
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = clamp(d[i] * gR);
+    d[i + 1] = clamp(d[i + 1] * gG);
+    d[i + 2] = clamp(d[i + 2] * gB);
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyHueOverlays(ctx, canvas) {
+  const { oL, oM, oS } = computeOverlays();
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    const L = d[i], M = d[i + 1], S = (L + M) / 2;
+    const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
+    const tL = tint(L, oL), tM = tint(M, oM), tS = tint(S, oS);
+    let r = tL.r + tM.r + tS.r, g = tL.g + tM.g + tS.g, b = tL.b + tM.b + tS.b;
+    d[i] = r > 255 ? 255 : r;
+    d[i + 1] = g > 255 ? 255 : g;
+    d[i + 2] = b > 255 ? 255 : b;
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function extractColorChannel(ctx, canvas, channel) {
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
   
@@ -313,58 +478,57 @@ function extractColorChannel(img, channel) {
     
     switch (channel) {
       case 'red':
-        data[i] = r;     // Red stays
-        data[i + 1] = 0; // Green = 0
-        data[i + 2] = 0; // Blue = 0
+        data[i] = r;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
         break;
       case 'green':
-        data[i] = 0;     // Red = 0
-        data[i + 1] = g; // Green stays
-        data[i + 2] = 0; // Blue = 0
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = 0;
         break;
       case 'blue':
-        data[i] = 0;     // Red = 0
-        data[i + 1] = 0; // Green = 0
-        data[i + 2] = b; // Blue stays
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = b;
         break;
       case 'green-blue':
-        data[i] = 0;     // Red = 0
-        data[i + 1] = g; // Green stays
-        data[i + 2] = b; // Blue stays
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = b;
         break;
     }
   }
   
   ctx.putImageData(imageData, 0, 0);
-  return canvas.toDataURL();
 }
 
-function applyFilters() {
-  const mainImg = document.getElementById('mainImg');
+// Update all displays
+function updateAllDisplays() {
+  if (!currentImageSrc) return;
   
-  // Wait for image to load
-  if (!mainImg.complete) {
-    mainImg.onload = applyFilters;
-    return;
-  }
+  // Update main image with all filters
+  processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
+    if (btnWB) {
+      applyWhiteBalance(ctx, canvas);
+    }
+    applyHueOverlays(ctx, canvas);
+  });
   
-  try {
-    // Update monochrome images
-    document.getElementById('monoR').src = extractColorChannel(mainImg, 'red');
-    document.getElementById('monoG').src = extractColorChannel(mainImg, 'green');
-    document.getElementById('monoB').src = extractColorChannel(mainImg, 'blue');
-    document.getElementById('monoGB').src = extractColorChannel(mainImg, 'green-blue');
-    
-    // Update original and after WB (for now, just copy original)
-    document.getElementById('originalImg').src = mainImg.src;
-    document.getElementById('afterWB').src = mainImg.src;
-  } catch (error) {
-    console.log('Error processing image:', error);
-  }
+  // Update original
+  processImage(currentImageSrc, 'originalImg');
+  
+  // Update after WB
+  processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
+  
+  // Update color channels
+  processImage(currentImageSrc, 'monoR', (ctx, canvas) => extractColorChannel(ctx, canvas, 'red'));
+  processImage(currentImageSrc, 'monoG', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green'));
+  processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
+  processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
 }
 
-// Info button functionality
-let btnInfo = false;
+// Info button
 document.getElementById("btnInfo").addEventListener("click", function() {
   btnInfo = !btnInfo;
   console.log(btnInfo ? "info is ON" : "info is OFF");
@@ -379,8 +543,7 @@ document.getElementById("btnInfo").addEventListener("click", function() {
   }
 });
 
-// White Balance button functionality
-let btnWB = false;
+// WB button and slider
 const wbButton = document.getElementById("btnWB");
 const wbSlider = document.getElementById("wbSlider");
 
@@ -395,6 +558,7 @@ function setWB(on) {
     wbButton.style.color = "#fff";
     wbButton.style.boxShadow = "0 0 0rem #f0f";
   }
+  updateAllDisplays();
 }
 
 wbButton.addEventListener("click", () => {
@@ -407,9 +571,10 @@ wbSlider.addEventListener("input", () => {
     setWB(true);
     console.log("WB Button turned ON by slider");
   }
+  updateAllDisplays();
 });
 
-// File upload functionality
+// Upload button
 const uploadBtn = document.getElementById("btnUpload");
 const fileInput = document.getElementById("fileInput");
 const mainImg = document.getElementById("mainImg");
@@ -421,38 +586,49 @@ uploadBtn.addEventListener("click", () => {
 fileInput.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
-  
-  const url = URL.createObjectURL(file);
-  mainImg.src = url;
-  
-  // Apply filters after image loads
-  mainImg.onload = applyFilters;
+  currentImageSrc = URL.createObjectURL(file);
+  updateAllDisplays();
 });
 
-// Sample image selection
+// Save button
+document.getElementById("btnSave").addEventListener("click", () => {
+  const mainImg = document.getElementById("mainImg");
+  if (mainImg.src) {
+    const link = document.createElement("a");
+    link.download = "filtered-image.png";
+    link.href = mainImg.src;
+    link.click();
+  }
+});
+
+// Slider updates
+document.getElementById("longConeSlider").addEventListener("input", updateAllDisplays);
+document.getElementById("protoanSlider").addEventListener("input", updateAllDisplays);
+
+// Sample image clicks
 document.getElementById("mosaicBox").addEventListener("click", () => {
-  mainImg.src = document.getElementById("mosaic").src;
-  mainImg.onload = applyFilters;
+  currentImageSrc = document.getElementById("mosaic").src;
+  updateAllDisplays();
 });
 
 document.getElementById("colorCheckerBox").addEventListener("click", () => {
-  mainImg.src = document.getElementById("colorCheckerImg").src;
-  mainImg.onload = applyFilters;
+  currentImageSrc = document.getElementById("colorCheckerImg").src;
+  updateAllDisplays();
 });
 
 document.getElementById("colorBarsBox").addEventListener("click", () => {
-  mainImg.src = document.getElementById("colorBarsImg").src;
-  mainImg.onload = applyFilters;
+  currentImageSrc = document.getElementById("colorBarsImg").src;
+  updateAllDisplays();
 });
 
 document.getElementById("yosemiteBox").addEventListener("click", () => {
-  mainImg.src = document.getElementById("yosemiteImg").src;
-  mainImg.onload = applyFilters;
+  currentImageSrc = document.getElementById("yosemiteImg").src;
+  updateAllDisplays();
 });
 
-// Initialize filters on page load
-applyFilters();
-
+// Initialize display values
+document.getElementById("whiteBalanceVal").textContent = "±0 μ";
+computeOverlays();
 </script>
 </body>
 </html>
