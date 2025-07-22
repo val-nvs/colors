@@ -215,7 +215,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <input id="longConeSlider" type="range" min="-180" value="0" max="179">
   </div>
   <div id="mainImgBox">
-    <img id="mainImg" alt="Main Image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cdefs%3E%3Cpattern id='mosaic' x='0' y='0' width='50' height='50' patternUnits='userSpaceOnUse'%3E%3Crect x='0' y='0' width='25' height='25' fill='%23ff0000'/%3E%3Crect x='25' y='0' width='25' height='25' fill='%2300ff00'/%3E%3Crect x='0' y='25' width='25' height='25' fill='%230000ff'/%3E%3Crect x='25' y='25' width='25' height='25' fill='%23ffff00'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23mosaic)'/%3E%3C/svg%3E">
+    <img id="mainImg" alt="Main Image" src="mosaic.svg">
   </div>
   <div class="sliderBox">
     <input id="protoanSlider" type="range" min="0" value="120" max="359">
@@ -240,29 +240,29 @@ input[type="range"]:hover::-webkit-slider-thumb {
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="originalImg" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect x='0' y='0' width='50' height='50' fill='%23ffffff'/%3E%3Crect x='50' y='0' width='50' height='50' fill='%23000000'/%3E%3Crect x='0' y='50' width='50' height='50' fill='%23000000'/%3E%3Crect x='50' y='50' width='50' height='50' fill='%23ffffff'/%3E%3C/svg%3E">
+      <img id="originalImg" alt="" src="checker.jpg">
       <p>Original</p>
     </div>
     <div class="photoFrame">
-      <img id="afterWB" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect x='0' y='0' width='50' height='50' fill='%23ffffff'/%3E%3Crect x='50' y='0' width='50' height='50' fill='%23000000'/%3E%3Crect x='0' y='50' width='50' height='50' fill='%23000000'/%3E%3Crect x='50' y='50' width='50' height='50' fill='%23ffffff'/%3E%3C/svg%3E">
+      <img id="afterWB" alt="" src="checker.jpg">
       <p>After White Balance</p>
     </div>
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="monoR" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23ff0000'/%3E%3C/svg%3E">
+      <img id="monoR" alt="" src="checker.jpg">
       <p>Red</p>
     </div>
     <div class="photoFrame">
-      <img id="monoG" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%2300ff00'/%3E%3C/svg%3E">
+      <img id="monoG" alt="" src="checker.jpg">
       <p>Green</p>
     </div>
     <div class="photoFrame">
-      <img id="monoB" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%230000ff'/%3E%3C/svg%3E">
+      <img id="monoB" alt="" src="checker.jpg">
       <p>Blue</p>
     </div>
     <div class="photoFrame">
-      <img id="monoGB" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%2300ffff'/%3E%3C/svg%3E">
+      <img id="monoGB" alt="" src="checker.jpg">
       <p>Green+Blue</p>
     </div>
   </div>
@@ -270,16 +270,20 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <p>Select sample image:</p>
     <div class="splitView">
       <div id="mosaicBox" class="photoFrame">
-        <img id="mosaic" alt="mosaic" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cdefs%3E%3Cpattern id='mosaic2' x='0' y='0' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Crect x='0' y='0' width='50' height='50' fill='%23ff0000'/%3E%3Crect x='50' y='0' width='50' height='50' fill='%2300ff00'/%3E%3Crect x='0' y='50' width='50' height='50' fill='%230000ff'/%3E%3Crect x='50' y='50' width='50' height='50' fill='%23ffff00'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23mosaic2)'/%3E%3C/svg%3E">
-        <p>Mosaic</p>
+        <img id="mosaic" alt="mosaic" src="mosaic.svg">
+        <!--<p></p>-->
       </div>
       <div id="colorCheckerBox" class="photoFrame">
-        <img id="colorCheckerImg" alt="colorChecker" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect x='0' y='0' width='50' height='50' fill='%23ffffff'/%3E%3Crect x='50' y='0' width='50' height='50' fill='%23000000'/%3E%3Crect x='0' y='50' width='50' height='50' fill='%23000000'/%3E%3Crect x='50' y='50' width='50' height='50' fill='%23ffffff'/%3E%3C/svg%3E">
+        <img id="colorCheckerImg" alt="colorChecker" src="checker.jpg">
         <p>Checker</p>
       </div>
       <div id="colorBarsBox" class="photoFrame">
-        <img id="colorBarsImg" alt="colorBars" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='100'%3E%3Crect x='0' y='0' width='40' height='100' fill='%23ffffff'/%3E%3Crect x='40' y='0' width='40' height='100' fill='%23ffff00'/%3E%3Crect x='80' y='0' width='40' height='100' fill='%2300ffff'/%3E%3Crect x='120' y='0' width='40' height='100' fill='%2300ff00'/%3E%3Crect x='160' y='0' width='40' height='100' fill='%23ff00ff'/%3E%3Crect x='200' y='0' width='40' height='100' fill='%23ff0000'/%3E%3Crect x='240' y='0' width='40' height='100' fill='%230000ff'/%3E%3C/svg%3E">
+        <img id="colorBarsImg" alt="colorBars" src="color_bars.png">
         <p>Bars</p>
+      </div>
+      <div id="yosemiteBox" class="photoFrame">
+        <img id="yosemiteImg" alt="yosemite cc-by Mikhail Kalugin" src="yosemite.jpg">
+        <p>Yosemite<span class="tiny"> CC-BY Mikhail Kalugin</span></p>
       </div>
     </div>
   </div>
@@ -438,6 +442,11 @@ document.getElementById("colorCheckerBox").addEventListener("click", () => {
 
 document.getElementById("colorBarsBox").addEventListener("click", () => {
   mainImg.src = document.getElementById("colorBarsImg").src;
+  mainImg.onload = applyFilters;
+});
+
+document.getElementById("yosemiteBox").addEventListener("click", () => {
+  mainImg.src = document.getElementById("yosemiteImg").src;
   mainImg.onload = applyFilters;
 });
 
