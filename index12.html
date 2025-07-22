@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
   <style>
+    * { font-family: 'Roboto Mono', monospace; }
     html, body {
       margin: 0;
       padding: 0;
@@ -19,9 +22,17 @@
       padding: 8px;
       text-align: center;
       z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
     }
-    #controls input {
-      margin: 0 8px;
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .control-group span {
+      margin-top: 4px;
     }
     #canvas-container {
       flex: 1;
@@ -66,17 +77,21 @@
 </head>
 <body>
   <div id="controls">
-    <!-- WHITE BALANCE (Relative mired) -->
-    <label>WB shift (μ):</label>
-    <input id="wbInput" type="range" min="-100" max="100" value="0">
-    <span id="wbVal">±0 μ</span>
-    <!-- HUE SLIDERS -->
-    <input id="hueL" type="range" min="-179" max="180" value="0">
-    <span id="hueLval">0°</span>
-    <input id="hueM" type="range" min="0" max="359" value="180">
-    <span id="hueMval">180°</span>
-    <!-- IMAGE SELECT -->
-    <input type="file" id="imgInput" accept="image/*">
+    <div class="control-group">
+      <input id="wbInput" type="range" min="-100" max="100" value="0">
+      <span id="wbVal">±0 μ</span>
+    </div>
+    <div class="control-group">
+      <input id="hueL" type="range" min="-179" max="180" value="0">
+      <span id="hueLval">0°</span>
+    </div>
+    <div class="control-group">
+      <input id="hueM" type="range" min="0" max="359" value="180">
+      <span id="hueMval">180°</span>
+    </div>
+    <div class="control-group">
+      <input type="file" id="imgInput" accept="image/*">
+    </div>
   </div>
   <div id="canvas-container">
     <canvas id="canvasWB"></canvas>
