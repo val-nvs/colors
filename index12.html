@@ -66,10 +66,10 @@
 </head>
 <body>
   <div id="controls">
-    <!-- WHITE BALANCE (Kelvin) -->
-    <label>White Balance:</label>
+    <!-- WHITE BALANCE (Relative mired) -->
+    <label>WB shift (μ):</label>
     <input id="wbInput" type="range" min="-100" max="100" value="0">
-    <span id="wbVal">6500 K</span>
+    <span id="wbVal">±0 μ</span>
     <!-- HUE SLIDERS -->
     <input id="hueL" type="range" min="-179" max="180" value="0">
     <span id="hueLval">0°</span>
@@ -79,191 +79,130 @@
     <input type="file" id="imgInput" accept="image/*">
   </div>
   <div id="canvas-container">
-    <!-- White Balance Only View -->
     <canvas id="canvasWB"></canvas>
-    <!-- Combined View -->
     <canvas id="canvas"></canvas>
   </div>
   <canvas id="pointerCanvas"></canvas>
-  <div id="cursorOverlay">
-    <img src="mouse.png" id="customCursor">
-  </div>
+  <div id="cursorOverlay"><img src="mouse.png" id="customCursor"></div>
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      const canvasWB   = document.getElementById('canvasWB');
-      const ctxWB      = canvasWB.getContext('2d');
-      const canvas     = document.getElementById('canvas');
-      const ctx        = canvas.getContext('2d');
+      const canvasWB = document.getElementById('canvasWB');
+      const ctxWB = canvasWB.getContext('2d');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
       const pointerCanvas = document.getElementById('pointerCanvas');
       const pointerCtx = pointerCanvas.getContext('2d');
-      const fileInput  = document.getElementById('imgInput');
-      const hueLInput  = document.getElementById('hueL');
-      const hueMInput  = document.getElementById('hueM');
-      const hueLVal    = document.getElementById('hueLval');
-      const hueMVal    = document.getElementById('hueMval');
-      const wbInput    = document.getElementById('wbInput');
-      const wbVal      = document.getElementById('wbVal');
-      const cursorOverlay = document.getElementById('cursorOverlay');
+      const fileInput = document.getElementById('imgInput');
+      const hueLInput = document.getElementById('hueL');
+      const hueMInput = document.getElementById('hueM');
+      const hueLVal = document.getElementById('hueLval');
+      const hueMVal = document.getElementById('hueMval');
+      const wbInput = document.getElementById('wbInput');
+      const wbVal = document.getElementById('wbVal');
       let lastImg = null;
-      let mousePos = { x: 0, y: 0 };
+      let mousePos = {x:0,y:0};
 
-      function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+      function clamp(v){return v<0?0:v>255?255:v;}
+      function kelvinToRgb(K){
+        const t=K/100;let r,g,b;
+        if(t<=66){r=255;g=99.4708*Math.log(t)-161.1196;
+          b=t<=19?0:138.5177*Math.log(t-10)-305.0448;
+        } else {r=329.6987*Math.pow(t-60,-0.1332);
+          g=288.1222*Math.pow(t-60,-0.0755);b=255;}
+        return{r:clamp(r),g:clamp(g),b:clamp(b)};
+      }
+      function hsv2rgb(h,s,v){h=((h%360)+360)%360;
+        const c=v*s,hp=h/60,x=c*(1-Math.abs((hp%2)-1));
+        let r1=0,g1=0,b1=0;
+        if(hp<1)[r1,g1,b1]=[c,x,0]; else if(hp<2)[r1,g1,b1]=[x,c,0];
+        else if(hp<3)[r1,g1,b1]=[0,c,x];else if(hp<4)[r1,g1,b1]=[0,x,c];
+        else if(hp<5)[r1,g1,b1]=[x,0,c];else[r1,g1,b1]=[c,0,x];
+        const m=v-c;return{r:(r1+m)*255,g:(g1+m)*255,b:(b1+m)*255};}
+      function normalize255(o){const s=o.r+o.g+o.b; if(!s)return{o:{r:0,g:0,b:0}};
+        const f=255/s;return{r:o.r*f,g:o.g*f,b:o.b*f};}
 
-      function kelvinToRgb(K) {
-        const temp = K / 100;
-        let r, g, b;
-        if (temp <= 66) {
-          r = 255;
-          g = 99.4708025861 * Math.log(temp) - 161.1195681661;
-          b = temp <= 19
-            ? 0
-            : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
-        } else {
-          r = 329.698727446 * Math.pow(temp - 60, -0.1332047592);
-          g = 288.1221695283 * Math.pow(temp - 60, -0.0755148492);
-          b = 255;
-        }
-        return { r: clamp(r), g: clamp(g), b: clamp(b) };
+      function computeOverlays(){
+        const L=+hueLInput.value,M=+hueMInput.value;
+        const hueL=((L%360)+360)%360;
+        const delta=120+(M/359)*120, hueM=(hueL+delta)%360;
+        hueLVal.textContent=hueL+'°';hueMVal.textContent=hueM.toFixed(0)+'°';
+        const oL=normalize255(hsv2rgb(hueL,1,1));
+        const oM=normalize255(hsv2rgb(hueM,1,1));
+        const rawS={r:Math.max(0,255-oL.r-oM.r),g:Math.max(0,255-oL.g-oM.g),b:Math.max(0,255-oL.b-oM.b)};
+        return{oL,oM,oS:normalize255(rawS)};
       }
 
-      function hsv2rgb(h, s, v) {
-        h = ((h % 360) + 360) % 360;
-        const c = v * s, hp = h / 60, x = c * (1 - Math.abs((hp % 2) - 1));
-        let [r1,g1,b1] = [0,0,0];
-        if (hp<1) [r1,g1,b1]=[c,x,0];
-        else if(hp<2)[r1,g1,b1]=[x,c,0];
-        else if(hp<3)[r1,g1,b1]=[0,c,x];
-        else if(hp<4)[r1,g1,b1]=[0,x,c];
-        else if(hp<5)[r1,g1,b1]=[x,0,c];
-        else [r1,g1,b1]=[c,0,x];
-        const m = v - c;
-        return { r:(r1+m)*255, g:(g1+m)*255, b:(b1+m)*255 };
-      }
-      function normalize255({r,g,b}) {
-        const sum = r+g+b;
-        if (!sum) return {r:0,g:0,b:0};
-        const f = 255/sum;
-        return {r:r*f, g:g*f, b:b*f};
-      }
-
-      function computeOverlays() {
-        const rawL = +hueLInput.value, rawM = +hueMInput.value;
-        const hueL = ((rawL%360)+360)%360;
-        const t = rawM/359, delta = 120 + t*120, effM = (hueL+delta)%360;
-        hueLVal.textContent = hueL+'°';
-        hueMVal.textContent = effM.toFixed(0)+'°';
-        const oL = normalize255(hsv2rgb(hueL,1,1));
-        const oM = normalize255(hsv2rgb(effM,1,1));
-        const rawS = {
-          r: Math.max(0,255-oL.r-oM.r),
-          g: Math.max(0,255-oL.g-oM.g),
-          b: Math.max(0,255-oL.b-oM.b)
-        };
-        return { oL, oM, oS: normalize255(rawS) };
-      }
-
-      function applyWhiteBalanceTo(ctx) {
-        const v = +wbInput.value;
-        // map slider –100..100 to Kelvin around 6500K ±5500K
-        const K = 6500 + v/100 * 5500;
-        wbVal.textContent = Math.round(K) + ' K';
-        const rgb = kelvinToRgb(K);
-        const gainR = rgb.r/255, gainG = rgb.g/255, gainB = rgb.b/255;
-        const img = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
-        const d = img.data;
-        for (let i=0; i<d.length; i+=4) {
-          d[i]   = clamp(d[i]   * gainR);
-          d[i+1] = clamp(d[i+1] * gainG);
-          d[i+2] = clamp(d[i+2] * gainB);
+      function applyWhiteBalanceTo(ctx){
+        const v=+wbInput.value;
+        const M0=1000000/6500;       // ≈154 μ
+        const deltaM=v/100*M0*0.99;    // ±99% of baseline
+        const Mt=M0+deltaM;
+        const K=1000000/Mt;
+        wbVal.textContent=(deltaM>=0?'+':'')+Math.round(deltaM)+' μ';
+        const rgb=kelvinToRgb(K);
+        const gR=rgb.r/255,gG=rgb.g/255,gB=rgb.b/255;
+        const img=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height);
+        const d=img.data;
+        for(let i=0;i<d.length;i+=4){
+          d[i]=clamp(d[i]*gR);
+          d[i+1]=clamp(d[i+1]*gG);
+          d[i+2]=clamp(d[i+2]*gB);
         }
         ctx.putImageData(img,0,0);
-        return K;
       }
 
-      function applyHueOverlays() {
-        const { oL,oM,oS } = computeOverlays();
-        const data = ctx.getImageData(0,0,canvas.width,canvas.height);
-        const d = data.data;
-        for (let i=0; i<d.length; i+=4) {
-          const L=d[i], M=d[i+1], S=(L+M)/2;
-          const tint = (v,o) => ({r:o.r*(v/255),g:o.g*(v/255),b:o.b*(v/255)});
-          const tL=tint(L,oL), tM=tint(M,oM), tS=tint(S,oS);
-          let r=tL.r+tM.r+tS.r, g=tL.g+tM.g+tS.g, b=tL.b+tM.b+tS.b;
+      function applyHueOverlays(){
+        const {oL,oM,oS}=computeOverlays();
+        const data=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const d=data.data;
+        for(let i=0;i<d.length;i+=4){
+          const L=d[i],M=d[i+1],S=(L+M)/2;
+          const tint=(v,o)=>({r:o.r*(v/255),g:o.g*(v/255),b:o.b*(v/255)});
+          const tL=tint(L,oL),tM=tint(M,oM),tS=tint(S,oS);
+          let r=tL.r+tM.r+tS.r,g=tL.g+tM.g+tS.g,b=tL.b+tM.b+tS.b;
           d[i]=r>255?255:r; d[i+1]=g>255?255:g; d[i+2]=b>255?255:b;
         }
         ctx.putImageData(data,0,0);
       }
 
-      function drawPointers() {
+      function drawPointers(){
         pointerCtx.clearRect(0,0,pointerCanvas.width,pointerCanvas.height);
         const len=40;
-        const rawL=+hueLInput.value, hueL=((rawL%360)+360)%360;
+        const L=+hueLInput.value;const hueL=((L%360)+360)%360;
         const delta=120+(+hueMInput.value/359)*120, hueM=(hueL+delta)%360;
-        const ang1=(hueL-90)*Math.PI/180, ang2=(hueM-90)*Math.PI/180;
-        pointerCtx.save();
-        pointerCtx.lineWidth=2; pointerCtx.strokeStyle='white';
-        pointerCtx.beginPath();
+        const ang1=(hueL-90)*Math.PI/180,ang2=(hueM-90)*Math.PI/180;
+        pointerCtx.save();pointerCtx.lineWidth=2;pointerCtx.strokeStyle='white';
+        pointerCtx.beginPath();pointerCtx.moveTo(mousePos.x,mousePos.y);
+        pointerCtx.lineTo(mousePos.x+len*Math.cos(ang1),mousePos.y+len*Math.sin(ang1));
         pointerCtx.moveTo(mousePos.x,mousePos.y);
-        pointerCtx.lineTo(mousePos.x+len*Math.cos(ang1),
-                          mousePos.y+len*Math.sin(ang1));
-        pointerCtx.moveTo(mousePos.x,mousePos.y);
-        pointerCtx.lineTo(mousePos.x+len*Math.cos(ang2),
-                          mousePos.y+len*Math.sin(ang2));
-        pointerCtx.stroke(); pointerCtx.restore();
+        pointerCtx.lineTo(mousePos.x+len*Math.cos(ang2),mousePos.y+len*Math.sin(ang2));
+        pointerCtx.stroke();pointerCtx.restore();
       }
 
-      function redraw() {
-        if (!lastImg) return;
-        const availW = window.innerWidth;
-        const availH = window.innerHeight - document.getElementById('controls').offsetHeight - 16;
-        const scale = Math.min(availW / (lastImg.width * 2 + 40), availH / lastImg.height);
-        const dispW = lastImg.width * scale;
-        const dispH = lastImg.height * scale;
-        [canvasWB, canvas].forEach(c => {
-          c.style.width = dispW + 'px';
-          c.style.height = dispH + 'px';
-          const dpr = window.devicePixelRatio || 1;
-          c.width = dispW * dpr;
-          c.height = dispH * dpr;
+      function redraw(){
+        if(!lastImg)return;
+        const wW=window.innerWidth,hH=window.innerHeight-document.getElementById('controls').offsetHeight-16;
+        const scale=Math.min(wW/(lastImg.width*2+40),hH/lastImg.height);
+        const dW=lastImg.width*scale,dH=lastImg.height*scale;
+        [canvasWB,canvas].forEach(c=>{
+          c.style.width=dW+'px';c.style.height=dH+'px';
+          const dpr=window.devicePixelRatio||1;
+          c.width=dW*dpr;c.height=dH*dpr;
         });
-        ctxWB.drawImage(lastImg, 0, 0, canvasWB.width, canvasWB.height);
+        ctxWB.drawImage(lastImg,0,0,canvasWB.width,canvasWB.height);
         applyWhiteBalanceTo(ctxWB);
-        ctx.drawImage(lastImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(lastImg,0,0,canvas.width,canvas.height);
         applyWhiteBalanceTo(ctx);
         applyHueOverlays();
       }
 
-      function resizePointerCanvas() {
-        pointerCanvas.width = window.innerWidth;
-        pointerCanvas.height = window.innerHeight;
-      }
-
-      window.addEventListener('mousemove', e => {
-        mousePos.x = e.clientX; mousePos.y = e.clientY;
-        cursorOverlay.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
-        drawPointers();
-      });
-
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0]; if (!file) return;
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = () => { lastImg = img; URL.revokeObjectURL(url); redraw(); };
-        img.src = url;
-      });
-
-      [hueLInput, hueMInput, wbInput].forEach(inp =>
-        inp.addEventListener('input', () => { redraw(); drawPointers(); })
-      );
-
-      window.addEventListener('resize', () => {
-        redraw(); resizePointerCanvas(); drawPointers();
-      });
-
-      wbVal.textContent = '6500 K';
-      resizePointerCanvas();
-      drawPointers();
+      function resizePointerCanvas(){pointerCanvas.width=window.innerWidth;pointerCanvas.height=window.innerHeight;}
+      window.addEventListener('mousemove',e=>{mousePos.x=e.clientX;mousePos.y=e.clientY;document.getElementById('cursorOverlay').style.transform=`translate(${e.clientX}px,${e.clientY}px)`;drawPointers();});
+      fileInput.addEventListener('change',()=>{const f=fileInput.files[0];if(!f)return;const url=URL.createObjectURL(f);const img=new Image();img.onload=()=>{lastImg=img;URL.revokeObjectURL(url);redraw();};img.src=url;});
+      [hueLInput,hueMInput,wbInput].forEach(i=>i.addEventListener('input',()=>{redraw();drawPointers();}));
+      window.addEventListener('resize',()=>{redraw();resizePointerCanvas();drawPointers();});
+      wbVal.textContent='±0 μ';resizePointerCanvas();drawPointers();
     });
   </script>
 </body>
