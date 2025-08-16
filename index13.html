@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Honk -->
+<link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
+<!-- Aref Ruqaa Ink -->
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
+<!-- Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<!-- Long Cang -->
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<!-- Launch full-screen from Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- Home-screen icon (iOS) -->
+<link rel="apple-touch-icon" href="/F814BB62-C0FA-4434-A9AE-198313FD8CA4.png">
+<!-- Browser favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<!-- (optional PNG favicon for modern browsers) -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<!-- 4. Theme-color (always black) -->
+<meta name="theme-color" content="#000000">
+
+<title>Color Channel Filter</title>
+
+<style>
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+.pageBox, .history {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.splitView {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.sliderBox {
+  width: 100%;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  flex: 1;
+}
+
+.photoFrame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #464646;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.photoFrame img {
+  border-radius: 0.2rem;
+}
+
+body {
+  background: #2b2b2b;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
+  font-size: 0.8rem;
+  color: #fff;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+p {
+  margin: 0.3rem auto;
+}
+
+body img {
+  display: block;
+  width: 100%;
+}
+
+button {
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  line-height: inherit;
+  background-color: #464646;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 0.35rem;
+}
+
+button:hover {
+  background-color: #444;
+  transform: translateY(0.2rem);
+}
+
+button:active {
+  background-color: #0f0;
+  transform: translateY(0);
+}
+
+button:focus {
+  outline: none;
+  background-color: #0ff;
+  transform: translateY(0.2rem);
+}
+
+#protoanSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+#longConeSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
+}
+
+#wbSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #03d, #fff, #f10);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background-size: 300% 100%;
+  height: 0.2rem;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2rem;
+  height: 1.5rem;
+  background: #fff;
+  border-radius: 10%;
+  cursor: pointer;
+  margin-top: -0.65rem;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0.5rem #fff;
+}
+
+/* text */
+.hanBig {
+  transform: scaleY(1.7);
+  font-family: "Long Cang", serif;
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hanHalf {
+  transform: scaleY(1.0);
+  font-family: "Long Cang", serif;
+  font-size: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tiny {
+  font-size: 0.5rem;
+  word-spacing: 0.01rem;
+  line-height: 0.2;
+}
+
+.header {
+  font-size: 5rem;
+  line-height: 0.59;
+  font-family: "Honk", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 1.4rem;
+}
+
+#mainImgBox {
+  width: 100%;
+}
+
+.button {
+  line-height: 0.5rem;
+  font-size: 0.5rem;
+}
+
+/* Hidden canvas for processing */
+#processingCanvas {
+  display: none;
+}
+
+/* Cursor styling for sample images */
+.photoFrame {
+  cursor: pointer;
+}
+
+.photoFrame:hover {
+  background-color: #555;
+}
+</style>
+</head>
+<body>
+
+<div class="pageBox">
+  <div class="header splitView">
+    <p id="protoanHueVal">180°</p>
+    <p id="longConeHueVal">0°</p>
+    <p id="whiteBalanceVal">±0 μ</p>
+  </div>
+  <div class="sliderBox">
+    <input id="longConeSlider" type="range" min="-180" value="0" max="179">
+  </div>
+  <div id="mainImgBox">
+    <img id="mainImg" alt="Main Image" src="">
+  </div>
+  <div class="sliderBox">
+    <input id="protoanSlider" type="range" min="0" value="180" max="359">
+  </div>
+  <div id="buttonBox" class="splitView">
+    <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
+    <div id="buttonGroup">
+      <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
+      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>GB</button>
+      <button id="btnB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>B</button>
+    </div>
+    <button id="btnInfo" class="button"><span class="material-symbols-outlined">pageview</span><br>Info</button>
+    <button id="btnSave" class="button"><span class="material-symbols-outlined">download</span><br>Save</button>
+  </div>
+  <div class="sliderBox">
+    <input id="wbSlider" type="range" min="-100" value="0" max="100">
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="originalImg" alt="" src="">
+      <p>Original</p>
+    </div>
+    <div class="photoFrame">
+      <img id="afterWB" alt="" src="">
+      <p>After White Balance</p>
+    </div>
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="monoR" alt="" src="">
+      <p>Red</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoG" alt="" src="">
+      <p>Green</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoB" alt="" src="">
+      <p>Blue</p>
+    </div>
+    <div class="photoFrame">
+      <img id="monoGB" alt="" src="">
+      <p>Green+Blue</p>
+    </div>
+  </div>
+  <div>
+    <p>Select sample image:</p>
+    <div class="splitView">
+      <div id="mosaicBox" class="photoFrame">
+        <img id="mosaic" alt="color mosaic" src="" crossorigin="anonymous">
+        <p>Mosaic</p>
+      </div>
+      <div id="colorCheckerBox" class="photoFrame">
+        <img id="colorCheckerImg" alt="colorful pattern" src="" crossorigin="anonymous">
+        <p>Checker</p>
+      </div>
+      <div id="colorBarsBox" class="photoFrame">
+        <img id="colorBarsImg" alt="color bars" src="" crossorigin="anonymous">
+        <p>Bars</p>
+      </div>
+      <div id="yosemiteBox" class="photoFrame">
+        <img id="yosemiteImg" alt="landscape" src="" crossorigin="anonymous">
+        <p>Gradient</p>
+      </div>
+    </div>
+  </div>
+  <div class="history">
+    <div class="photoFrame">
+      <img id="" alt="red pattern" loading="lazy" src="" crossorigin="anonymous">
+      <p>Red Gradient</p>
+      <p>Test Pattern</p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="green pattern" loading="lazy" src="" crossorigin="anonymous">
+      <p>Green Gradient</p>
+    </div>
+    <div class="photoFrame">
+      <img id="" alt="blue pattern" loading="lazy" src="" crossorigin="anonymous">
+      <p>Blue Gradient</p>
+      <p>Color Test</p>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden canvas for processing -->
+<canvas id="processingCanvas"></canvas>
+
+<script>
+// Global variables
+let currentImageSrc = null;
+let btnInfo = false;
+let btnWB = false;
+
+// Working filter functions from index12.html
+function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+
+function kelvinToRgb(K) {
+  const t = K / 100;
+  let r, g, b;
+  if (t <= 66) {
+    r = 255;
+    g = 99.4708 * Math.log(t) - 161.1196;
+    b = t <= 19 ? 0 : 138.5177 * Math.log(t - 10) - 305.0448;
+  } else {
+    r = 329.6987 * Math.pow(t - 60, -0.1332);
+    g = 288.1222 * Math.pow(t - 60, -0.0755);
+    b = 255;
+  }
+  return { r: clamp(r), g: clamp(g), b: clamp(b) };
+}
+
+function hsv2rgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s;
+  const hp = h / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (hp < 1) [r1, g1, b1] = [c, x, 0];
+  else if (hp < 2) [r1, g1, b1] = [x, c, 0];
+  else if (hp < 3) [r1, g1, b1] = [0, c, x];
+  else if (hp < 4) [r1, g1, b1] = [0, x, c];
+  else if (hp < 5) [r1, g1, b1] = [x, 0, c];
+  else [r1, g1, b1] = [c, 0, x];
+  const m = v - c;
+  return { r: (r1 + m) * 255, g: (g1 + m) * 255, b: (b1 + m) * 255 };
+}
+
+function normalize255(o) {
+  const s = o.r + o.g + o.b;
+  if (!s) return { r: 0, g: 0, b: 0 };
+  const f = 255 / s;
+  return { r: o.r * f, g: o.g * f, b: o.b * f };
+}
+
+function computeOverlays() {
+  const L = +document.getElementById('longConeSlider').value;
+  const M = +document.getElementById('protoanSlider').value;
+  const hueL = ((L % 360) + 360) % 360;
+  const delta = 120 + (M / 359) * 120;
+  const hueM = (hueL + delta) % 360;
+  
+  document.getElementById('longConeHueVal').textContent = hueL + '°';
+  document.getElementById('protoanHueVal').textContent = hueM.toFixed(0) + '°';
+  
+  const oL = normalize255(hsv2rgb(hueL, 1, 1));
+  const oM = normalize255(hsv2rgb(hueM, 1, 1));
+  const rawS = {
+    r: Math.max(0, 255 - oL.r - oM.r),
+    g: Math.max(0, 255 - oL.g - oM.g),
+    b: Math.max(0, 255 - oL.b - oM.b)
+  };
+  
+  return { oL, oM, oS: normalize255(rawS) };
+}
+
+// Canvas processing functions
+function processImage(imgSrc, targetImgId, processFunc) {
+  if (!imgSrc) return;
+  
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function() {
+    const canvas = document.getElementById('processingCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    
+    if (processFunc) {
+      processFunc(ctx, canvas);
+    }
+    
+    // Convert to data URL and set to target img
+    const dataUrl = canvas.toDataURL();
+    document.getElementById(targetImgId).src = dataUrl;
+  };
+  img.onerror = function() {
+    console.log('Error loading image:', imgSrc);
+  };
+  img.src = imgSrc;
+}
+
+// Processing functions - using working versions from index12.html
+function applyWhiteBalance(ctx, canvas) {
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500; // ≈154 μ
+  const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+  const Mt = M0 + deltaM;
+  const K = 1000000 / Mt;
+  
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+  
+  const rgb = kelvinToRgb(K);
+  const gR = rgb.r / 255, gG = rgb.g / 255, gB = rgb.b / 255;
+  
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = clamp(d[i] * gR);
+    d[i + 1] = clamp(d[i + 1] * gG);
+    d[i + 2] = clamp(d[i + 2] * gB);
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyHueOverlays(ctx, canvas) {
+  const { oL, oM, oS } = computeOverlays();
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    const L = d[i], M = d[i + 1], S = (L + M) / 2;
+    const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
+    const tL = tint(L, oL), tM = tint(M, oM), tS = tint(S, oS);
+    let r = tL.r + tM.r + tS.r, g = tL.g + tM.g + tS.g, b = tL.b + tM.b + tS.b;
+    d[i] = r > 255 ? 255 : r;
+    d[i + 1] = g > 255 ? 255 : g;
+    d[i + 2] = b > 255 ? 255 : b;
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function extractColorChannel(ctx, canvas, channel) {
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    
+    switch (channel) {
+      case 'red':
+        data[i] = r;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
+        break;
+      case 'green':
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = 0;
+        break;
+      case 'blue':
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = b;
+        break;
+      case 'green-blue':
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = b;
+        break;
+    }
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+// Update all displays
+function updateAllDisplays() {
+  if (!currentImageSrc) return;
+  
+  // Update main image with all filters
+  processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
+    // Always apply white balance when slider moves (like index12)
+    const wbValue = +document.getElementById('wbSlider').value;
+    if (wbValue !== 0 || btnWB) {
+      applyWhiteBalance(ctx, canvas);
+    }
+    applyHueOverlays(ctx, canvas);
+  });
+  
+  // Update original
+  processImage(currentImageSrc, 'originalImg');
+  
+  // Update after WB - always show white balance effect
+  processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
+  
+  // Update color channels
+  processImage(currentImageSrc, 'monoR', (ctx, canvas) => extractColorChannel(ctx, canvas, 'red'));
+  processImage(currentImageSrc, 'monoG', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green'));
+  processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
+  processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
+}
+
+// Info button
+document.getElementById("btnInfo").addEventListener("click", function() {
+  btnInfo = !btnInfo;
+  console.log(btnInfo ? "info is ON" : "info is OFF");
+  if (btnInfo) {
+    this.style.backgroundColor = "#d4d4d4";
+    this.style.color = "#000";
+    this.style.boxShadow = "0 0 0.5rem #fff";
+  } else {
+    this.style.backgroundColor = "#464646";
+    this.style.color = "#fff";
+    this.style.boxShadow = "0 0 0rem #f0f";
+  }
+});
+
+// WB button and slider
+const wbButton = document.getElementById("btnWB");
+const wbSlider = document.getElementById("wbSlider");
+
+function setWB(on) {
+  btnWB = on;
+  if (btnWB) {
+    wbButton.style.backgroundColor = "#d4d4d4";
+    wbButton.style.color = "#000";
+    wbButton.style.boxShadow = "0 0 0.5rem #fff";
+  } else {
+    wbButton.style.backgroundColor = "#464646";
+    wbButton.style.color = "#fff";
+    wbButton.style.boxShadow = "0 0 0rem #f0f";
+  }
+  updateAllDisplays();
+}
+
+wbButton.addEventListener("click", () => {
+  setWB(!btnWB);
+  console.log(btnWB ? "Button is ON" : "Button is OFF");
+});
+
+wbSlider.addEventListener("input", () => {
+  // Update the white balance value display immediately
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500; // ≈154 μ
+  const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+  
+  if (!btnWB) {
+    setWB(true);
+    console.log("WB Button turned ON by slider");
+  }
+  updateAllDisplays();
+});
+
+// Upload button
+const uploadBtn = document.getElementById("btnUpload");
+const fileInput = document.getElementById("fileInput");
+const mainImg = document.getElementById("mainImg");
+
+uploadBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  currentImageSrc = URL.createObjectURL(file);
+  updateAllDisplays();
+});
+
+// Save button
+document.getElementById("btnSave").addEventListener("click", () => {
+  const mainImg = document.getElementById("mainImg");
+  if (mainImg.src) {
+    const link = document.createElement("a");
+    link.download = "filtered-image.png";
+    link.href = mainImg.src;
+    link.click();
+  }
+});
+
+// Slider updates
+document.getElementById("longConeSlider").addEventListener("input", updateAllDisplays);
+document.getElementById("protoanSlider").addEventListener("input", updateAllDisplays);
+
+// Sample image clicks
+document.getElementById("mosaicBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("mosaic").src;
+  updateAllDisplays();
+});
+
+document.getElementById("colorCheckerBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("colorCheckerImg").src;
+  updateAllDisplays();
+});
+
+document.getElementById("colorBarsBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("colorBarsImg").src;
+  updateAllDisplays();
+});
+
+document.getElementById("yosemiteBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("yosemiteImg").src;
+  updateAllDisplays();
+});
+
+// Create sample patterns
+function createMosaicPattern() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  const ctx = canvas.getContext('2d');
+  
+  for (let x = 0; x < canvas.width; x += 20) {
+    for (let y = 0; y < canvas.height; y += 20) {
+      const hue = (x + y) % 360;
+      ctx.fillStyle = `hsl(${hue}, 80%, 50%)`;
+      ctx.fillRect(x, y, 20, 20);
+    }
+  }
+  return canvas.toDataURL();
+}
+
+function createCheckerPattern() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  const ctx = canvas.getContext('2d');
+  
+  const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+  for (let x = 0; x < canvas.width; x += 40) {
+    for (let y = 0; y < canvas.height; y += 40) {
+      const colorIndex = ((x / 40) + (y / 40)) % colors.length;
+      ctx.fillStyle = colors[colorIndex];
+      ctx.fillRect(x, y, 40, 40);
+    }
+  }
+  return canvas.toDataURL();
+}
+
+function createBarsPattern() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  const ctx = canvas.getContext('2d');
+  
+  const colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#0080ff', '#0000ff', '#8000ff'];
+  const barWidth = canvas.width / colors.length;
+  
+  colors.forEach((color, i) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(i * barWidth, 0, barWidth, canvas.height);
+  });
+  return canvas.toDataURL();
+}
+
+function createGradientPattern() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  const ctx = canvas.getContext('2d');
+  
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#ff0000');
+  gradient.addColorStop(0.2, '#ff8000');
+  gradient.addColorStop(0.4, '#ffff00');
+  gradient.addColorStop(0.6, '#00ff00');
+  gradient.addColorStop(0.8, '#0000ff');
+  gradient.addColorStop(1, '#8000ff');
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL();
+}
+
+function createColorGradient(color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 250;
+  const ctx = canvas.getContext('2d');
+  
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, '#ffffff');
+  gradient.addColorStop(0.5, color);
+  gradient.addColorStop(1, '#000000');
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL();
+}
+
+// Initialize display values
+document.getElementById("whiteBalanceVal").textContent = "±0 μ";
+computeOverlays();
+
+// Initialize white balance display
+const v = +document.getElementById('wbSlider').value;
+const M0 = 1000000 / 6500; // ≈154 μ
+const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+
+// Create and load sample patterns
+document.getElementById('mosaic').src = createMosaicPattern();
+document.getElementById('colorCheckerImg').src = createCheckerPattern();
+document.getElementById('colorBarsImg').src = createBarsPattern();
+document.getElementById('yosemiteImg').src = createGradientPattern();
+
+// Set up history section images
+const historyImgs = document.querySelectorAll('.history img');
+const historyColors = ['#ff0000', '#00ff00', '#0000ff'];
+historyImgs.forEach((img, index) => {
+  if (index < historyColors.length) {
+    img.src = createColorGradient(historyColors[index]);
+  }
+});
+
+// Create a default colorful test pattern
+function createDefaultPattern() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 400;
+  canvas.height = 300;
+  const ctx = canvas.getContext('2d');
+  
+  // Create a colorful gradient pattern
+  for (let x = 0; x < canvas.width; x += 50) {
+    for (let y = 0; y < canvas.height; y += 50) {
+      const hue = (x + y) % 360;
+      ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+      ctx.fillRect(x, y, 50, 50);
+    }
+  }
+  
+  // Add some geometric shapes
+  ctx.fillStyle = '#ff0000';
+  ctx.fillRect(50, 50, 100, 50);
+  
+  ctx.fillStyle = '#00ff00';
+  ctx.beginPath();
+  ctx.arc(300, 100, 40, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.fillStyle = '#0000ff';
+  ctx.beginPath();
+  ctx.moveTo(150, 200);
+  ctx.lineTo(200, 150);
+  ctx.lineTo(250, 200);
+  ctx.closePath();
+  ctx.fill();
+  
+  return canvas.toDataURL();
+}
+
+// Load default pattern
+currentImageSrc = createDefaultPattern();
+updateAllDisplays();
+</script>
+</body>
+</html>
