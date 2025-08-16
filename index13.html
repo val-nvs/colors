@@ -322,6 +322,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
 let currentImageSrc = null;
 let btnInfo = false;
 let btnWB = false;
+let channelMode = 'G'; // 'G', 'B', or 'GB'
 
 // Working filter functions from index12.html
 function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
@@ -371,7 +372,10 @@ function computeOverlays() {
   const delta = 120 + (M / 359) * 120;
   const hueM = (hueL + delta) % 360;
   
-  document.getElementById('longConeHueVal').textContent = hueL + '°';
+  // Display hueL as negative when > 180 (so 359 becomes -1, 181 becomes -179, etc.)
+  const displayHueL = hueL > 180 ? hueL - 360 : hueL;
+  document.getElementById('longConeHueVal').textContent = displayHueL + '°';
+  
   document.getElementById('protoanHueVal').textContent = hueM.toFixed(0) + '°';
   
   const oL = normalize255(hsv2rgb(hueL, 1, 1));
@@ -472,7 +476,21 @@ function applyHueOverlays(ctx, canvas) {
   const d = imageData.data;
   
   for (let i = 0; i < d.length; i += 4) {
-    const L = d[i], M = d[i + 1], S = (L + M) / 2;
+    const L = d[i]; // Always RED channel
+    let M, S;
+    
+    // Switch protoan input based on channel mode
+    if (channelMode === 'G') {
+      M = d[i + 1]; // GREEN channel
+      S = (L + M) / 2; // (RED + GREEN) / 2
+    } else if (channelMode === 'B') {
+      M = d[i + 2]; // BLUE channel
+      S = (L + M) / 2; // (RED + BLUE) / 2
+    } else if (channelMode === 'GB') {
+      M = (d[i + 1] + d[i + 2]) / 2; // (GREEN + BLUE) / 2
+      S = (L + M) / 2; // (RED + (GREEN+BLUE)/2) / 2
+    }
+    
     const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
     const tL = tint(L, oL), tM = tint(M, oM), tS = tint(S, oS);
     let r = tL.r + tM.r + tS.r, g = tL.g + tM.g + tS.g, b = tL.b + tM.b + tS.b;
@@ -526,9 +544,8 @@ function updateAllDisplays() {
   
   // Update main image with all filters
   processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
-    // Always apply white balance when slider moves (like index12)
-    const wbValue = +document.getElementById('wbSlider').value;
-    if (wbValue !== 0 || btnWB) {
+    // Only apply white balance if WB button is ON
+    if (btnWB) {
       applyWhiteBalance(ctx, canvas);
     }
     applyHueOverlays(ctx, canvas);
@@ -537,7 +554,7 @@ function updateAllDisplays() {
   // Update original
   processImage(currentImageSrc, 'originalImg');
   
-  // Update after WB - always show white balance effect
+  // Update after WB - always show white balance effect (preview)
   processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
   
   // Update color channels
@@ -546,6 +563,44 @@ function updateAllDisplays() {
   processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
   processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
 }
+
+// Channel button functions
+function setChannelMode(mode) {
+  channelMode = mode;
+  
+  // Update button states
+  const btnG = document.getElementById("btnG");
+  const btnGB = document.getElementById("btnGB");
+  const btnB = document.getElementById("btnB");
+  
+  // Reset all buttons
+  [btnG, btnGB, btnB].forEach(btn => {
+    btn.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>' + btn.innerHTML.split('<br>')[1];
+    btn.style.backgroundColor = "#464646";
+    btn.style.color = "#fff";
+    btn.style.boxShadow = "0 0 0rem #f0f";
+  });
+  
+  // Set active button
+  let activeBtn;
+  if (mode === 'G') activeBtn = btnG;
+  else if (mode === 'GB') activeBtn = btnGB;
+  else if (mode === 'B') activeBtn = btnB;
+  
+  if (activeBtn) {
+    activeBtn.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>' + activeBtn.innerHTML.split('<br>')[1];
+    activeBtn.style.backgroundColor = "#d4d4d4";
+    activeBtn.style.color = "#000";
+    activeBtn.style.boxShadow = "0 0 0.5rem #fff";
+  }
+  
+  updateAllDisplays();
+}
+
+// Channel button event listeners
+document.getElementById("btnG").addEventListener("click", () => setChannelMode('G'));
+document.getElementById("btnGB").addEventListener("click", () => setChannelMode('GB'));
+document.getElementById("btnB").addEventListener("click", () => setChannelMode('B'));
 
 // Info button
 document.getElementById("btnInfo").addEventListener("click", function() {
@@ -696,6 +751,9 @@ function createPattern(type) {
 document.getElementById("whiteBalanceVal").textContent = "±0 μ";
 computeOverlays();
 updateSliderGradients();
+
+// Initialize channel mode
+setChannelMode('G');
 
 // Initialize white balance display
 const v = +document.getElementById('wbSlider').value;
