@@ -75,7 +75,8 @@ html {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  background: #464646;
+  background: #30363d;
+  border: 1px solid #30363d;
   border-radius: 0.5rem;
   text-align: center;
 }
@@ -85,10 +86,10 @@ html {
 }
 
 body {
-  background: #2b2b2b;
+  background: #0D1117;
   font-family: "Atkinson Hyperlegible Next", sans-serif;
   font-size: 0.8rem;
-  color: #fff;
+  color: #e6edf3;
   max-width: 36rem;
   margin: 0 auto;
 }
@@ -105,29 +106,32 @@ body img {
 button {
   -webkit-appearance: none;
   font: inherit;
-  color: inherit;
+  color: #e6edf3;
   cursor: pointer;
   line-height: inherit;
-  background-color: #464646;
+  background-color: #30363d;
+  border: 1px solid #30363d;
   padding: 0.4rem 0.6rem;
-  border: none;
   border-radius: 0.35rem;
 }
 
 button:hover {
-  background-color: #444;
-  transform: translateY(0.2rem);
+  background-color: #262c36;
+  border-color: #586069;
+  transform: translateY(0.1rem);
 }
 
 button:active {
-  background-color: #0f0;
+  background-color: #238636;
+  border-color: #238636;
   transform: translateY(0);
 }
 
 button:focus {
   outline: none;
-  background-color: #0ff;
-  transform: translateY(0.2rem);
+  background-color: #1f6feb;
+  border-color: #1f6feb;
+  transform: translateY(0.1rem);
 }
 
 #protoanSlider::-webkit-slider-runnable-track {
@@ -226,7 +230,8 @@ input[type="range"]:hover::-webkit-slider-thumb {
 }
 
 .photoFrame:hover {
-  background-color: #555;
+  background-color: #262c36;
+  border-color: #586069;
 }
 </style>
 </head>
@@ -234,9 +239,18 @@ input[type="range"]:hover::-webkit-slider-thumb {
 
 <div class="pageBox">
   <div class="header splitView">
-    <p id="protoanHueVal">180°</p>
-    <p id="longConeHueVal">0°</p>
-    <p id="whiteBalanceVal">±0 μ</p>
+    <div style="text-align: center;">
+      <p style="font-size: 1rem; opacity: 0.7; margin: 0;">Cool Color [G, G+B, B]</p>
+      <p id="protoanHueVal">180°</p>
+    </div>
+    <div style="text-align: center;">
+      <p style="font-size: 1rem; opacity: 0.7; margin: 0;">Warm Color [R]</p>
+      <p id="longConeHueVal">0°</p>
+    </div>
+    <div style="text-align: center;">
+      <p style="font-size: 1rem; opacity: 0.7; margin: 0;">White Balance</p>
+      <p id="whiteBalanceVal">±0 μ</p>
+    </div>
   </div>
   <div class="sliderBox">
     <input id="longConeSlider" type="range" min="-180" value="0" max="179">
@@ -253,7 +267,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
     <div id="buttonGroup">
       <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
-      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>C</button>
+      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>C (G+B)</button>
       <button id="btnB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>B</button>
     </div>
     <button id="btnInfo" class="button"><span class="material-symbols-outlined">pageview</span><br>Info</button>
@@ -616,13 +630,14 @@ function setChannelMode(mode) {
   
   // Reset all buttons to off state
   btnG.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>G';
-  btnGB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>C';
+  btnGB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>C (G+B)';
   btnB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>B';
   
   [btnG, btnGB, btnB].forEach(btn => {
-    btn.style.backgroundColor = "#464646";
-    btn.style.color = "#fff";
-    btn.style.boxShadow = "0 0 0rem #f0f";
+    btn.style.backgroundColor = "#30363d";
+    btn.style.borderColor = "#30363d";
+    btn.style.color = "#e6edf3";
+    btn.style.boxShadow = "none";
   });
   
   // Set active button
@@ -632,16 +647,17 @@ function setChannelMode(mode) {
     btnG.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>G';
   } else if (mode === 'GB') {
     activeBtn = btnGB;
-    btnGB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>C';
+    btnGB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>C (G+B)';
   } else if (mode === 'B') {
     activeBtn = btnB;
     btnB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>B';
   }
   
   if (activeBtn) {
-    activeBtn.style.backgroundColor = "#d4d4d4";
-    activeBtn.style.color = "#000";
-    activeBtn.style.boxShadow = "0 0 0.5rem #fff";
+    activeBtn.style.backgroundColor = "#c9d1d9";
+    activeBtn.style.borderColor = "#c9d1d9";
+    activeBtn.style.color = "#0D1117";
+    activeBtn.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
   }
   
   updateAllDisplays();
@@ -657,13 +673,15 @@ document.getElementById("btnInfo").addEventListener("click", function() {
   btnInfo = !btnInfo;
   console.log(btnInfo ? "info is ON" : "info is OFF");
   if (btnInfo) {
-    this.style.backgroundColor = "#d4d4d4";
-    this.style.color = "#000";
-    this.style.boxShadow = "0 0 0.5rem #fff";
+    this.style.backgroundColor = "#c9d1d9";
+    this.style.borderColor = "#c9d1d9";
+    this.style.color = "#0D1117";
+    this.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
   } else {
-    this.style.backgroundColor = "#464646";
-    this.style.color = "#fff";
-    this.style.boxShadow = "0 0 0rem #f0f";
+    this.style.backgroundColor = "#30363d";
+    this.style.borderColor = "#30363d";
+    this.style.color = "#e6edf3";
+    this.style.boxShadow = "none";
   }
   updateAllDisplays(); // Refresh image to show/hide overlay
 });
@@ -675,13 +693,15 @@ const wbSlider = document.getElementById("wbSlider");
 function setWB(on) {
   btnWB = on;
   if (btnWB) {
-    wbButton.style.backgroundColor = "#d4d4d4";
-    wbButton.style.color = "#000";
-    wbButton.style.boxShadow = "0 0 0.5rem #fff";
+    wbButton.style.backgroundColor = "#c9d1d9";
+    wbButton.style.borderColor = "#c9d1d9";
+    wbButton.style.color = "#0D1117";
+    wbButton.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
   } else {
-    wbButton.style.backgroundColor = "#464646";
-    wbButton.style.color = "#fff";
-    wbButton.style.boxShadow = "0 0 0rem #f0f";
+    wbButton.style.backgroundColor = "#30363d";
+    wbButton.style.borderColor = "#30363d";
+    wbButton.style.color = "#e6edf3";
+    wbButton.style.boxShadow = "none";
   }
   updateAllDisplays();
 }
@@ -844,7 +864,7 @@ document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : ''
 // Create and load sample patterns
 document.getElementById('mosaic').src = createPattern('mosaic');
 document.getElementById('colorCheckerImg').src = 'https://upload.wikimedia.org/wikipedia/commons/a/ad/Gretag-Macbeth_ColorChecker.jpg';
-document.getElementById('colorBarsImg').src = createPattern('bars');
+document.getElementById('colorBarsImg').src = './color_bars.png';
 document.getElementById('yosemiteImg').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Color_circle_%28RGB%29.svg/960px-Color_circle_%28RGB%29.svg.png';
 </script>
 </body>
