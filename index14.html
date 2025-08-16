@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Atkinson Hyperlegible Next -->
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<!-- Long Cang for Chinese characters -->
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
 <!-- Material Symbols Outlined -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
@@ -28,10 +30,7 @@
 <title>Color Channel Filter</title>
 
 <style>
-@font-face {
-  font-family: "Honk";
-  src: url("Honk-VF.ttf") format("truetype");
-}
+@import url('https://fonts.googleapis.com/css2?family=Sixtyfour:BLED,SCAN@0..100,-53..100&display=swap');
 
 html {
   -webkit-text-size-adjust: none;
@@ -56,6 +55,106 @@ html {
 
 .sliderBox {
   width: 100%;
+}
+
+/* Slider grouping styles */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  background: #30363d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  margin: 0.2rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sliderGroup .groupLabel {
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0 0 0.4rem 0;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.sliderGroup input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Channel grouping styles */
+.channelGroup {
+  display: flex;
+  flex-direction: column;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin: 0.2rem;
+}
+
+.groupLabel {
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.channelOptions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.channelOptions .photoFrame {
+  flex: 1;
+}
+
+/* Upload box styling */
+#uploadBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+  cursor: pointer;
+}
+
+#uploadBox:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+/* Channel preview boxes are clickable */
+#greenFrame, #greenBlueFrame, #blueFrame {
+  cursor: pointer;
+}
+
+#greenFrame:hover, #greenBlueFrame:hover, #blueFrame:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+/* History section wider frames */
+.history .photoFrame {
+  max-width: none;
+  width: 100%;
+}
+
+/* Red channel always highlighted and unclickable */
+.red-channel-disabled {
+  border: 2px solid #c9d1d9 !important;
+  box-shadow: 0 0 0.5rem rgba(201, 209, 217, 0.5) !important;
+  cursor: not-allowed !important;
+}
+
+.red-channel-disabled:hover {
+  background-color: #30363d !important;
+  border-color: #c9d1d9 !important;
+  cursor: not-allowed !important;
 }
 
 .buttonGroup {
@@ -85,6 +184,16 @@ html {
   border-radius: 0.2rem;
 }
 
+/* Cursor styling for sample images */
+.photoFrame {
+  cursor: pointer;
+}
+
+.photoFrame:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
 body {
   background: #0D1117;
   font-family: "Atkinson Hyperlegible Next", sans-serif;
@@ -92,6 +201,8 @@ body {
   color: #e6edf3;
   max-width: 36rem;
   margin: 0 auto;
+  transform: scale(1.5);
+  transform-origin: top center;
 }
 
 p {
@@ -179,20 +290,36 @@ input[type="range"]:hover::-webkit-slider-thumb {
   line-height: 0.2;
 }
 
+.hanBig {
+  font-size: 1.5rem;
+  line-height: 1;
+  font-family: "Long Cang", cursive;
+}
+
+.hanHalf {
+  font-size: 0.75rem;
+  line-height: 1;
+  font-family: "Long Cang", cursive;
+}
+
 .header {
-  font-size: 5rem;
+  font-size: 2.5rem;
   line-height: 0.59;
-  font-family: "Honk", sans-serif;
+  font-family: "Sixtyfour", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "BLED" 0, "SCAN" 0;
 }
 
 /* KEYFRAMES for number animation */
 @keyframes morph {
-  from { font-variation-settings: "MORF" 10; }
-  to   { font-variation-settings: "MORF" 15; }
+  from { font-variation-settings: "BLED" 0, "SCAN" 0; }
+  to   { font-variation-settings: "BLED" 50, "SCAN" 50; }
 }
 @keyframes morph0 {
-  from { font-variation-settings: "MORF" 15; }
-  to   { font-variation-settings: "MORF" 10; }
+  from { font-variation-settings: "BLED" 50, "SCAN" 50; }
+  to   { font-variation-settings: "BLED" 0, "SCAN" 0; }
 }
 
 .material-symbols-outlined {
@@ -217,89 +344,13 @@ input[type="range"]:hover::-webkit-slider-thumb {
 #processingCanvas {
   display: none;
 }
-
-/* Cursor styling for sample images */
-.photoFrame {
-  cursor: pointer;
-}
-
-.photoFrame:hover {
-  background-color: #262c36;
-  border-color: #586069;
-}
-
-/* Channel preview boxes are clickable */
-#greenFrame, #greenBlueFrame, #blueFrame {
-  cursor: pointer;
-}
-
-#greenFrame:hover, #greenBlueFrame:hover, #blueFrame:hover {
-  background-color: #262c36;
-  border-color: #586069;
-}
-
-/* Channel grouping styles */
-.channelGroup {
-  display: flex;
-  flex-direction: column;
-  background: #21262d;
-  border: 1px solid #30363d;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  margin: 0.2rem;
-}
-
-.groupLabel {
-  font-size: 0.7rem;
-  text-align: center;
-  margin: 0 0 0.5rem 0;
-  opacity: 0.8;
-  font-weight: 600;
-}
-
-.channelOptions {
-  display: flex;
-  gap: 0.3rem;
-}
-
-.channelOptions .photoFrame {
-  flex: 1;
-}
-
-/* Upload box styling */
-#uploadBox {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 120px;
-  cursor: pointer;
-}
-
-#uploadBox:hover {
-  background-color: #262c36;
-  border-color: #586069;
-}
-
-/* Red channel always highlighted and unclickable */
-.red-channel-disabled {
-  border: 2px solid #c9d1d9 !important;
-  box-shadow: 0 0 0.5rem rgba(201, 209, 217, 0.5) !important;
-  cursor: not-allowed !important;
-}
-
-.red-channel-disabled:hover {
-  background-color: #30363d !important;
-  border-color: #c9d1d9 !important;
-  cursor: not-allowed !important;
-}
 </style>
 </head>
 <body>
 
 <div class="pageBox">
   <div>
-    <p>Select sample image:</p>
+    <p>Select image:</p>
     <div class="splitView">
       <div id="uploadBox" class="photoFrame">
         <span class="material-symbols-outlined" style="font-size: 3rem; margin: 1rem;">upload</span>
@@ -307,15 +358,15 @@ input[type="range"]:hover::-webkit-slider-thumb {
         <input type="file" id="fileInputSample" accept="image/*" style="display: none;">
       </div>
       <div id="colorCheckerBox" class="photoFrame">
-        <img id="colorCheckerImg" alt="color checker" src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Gretag-Macbeth_ColorChecker.jpg" crossorigin="anonymous">
+        <img id="colorCheckerImg" alt="color checker" src="checker.jpg">
         <p>Color Checker</p>
       </div>
       <div id="colorBarsBox" class="photoFrame">
         <img id="colorBarsImg" alt="color bars" src="color_bars.png">
         <p>Bars</p>
       </div>
-      <div id="yosemiteBox" class="photoFrame">
-        <img id="yosemiteImg" alt="color circle" src="circle.jpg">
+      <div id="circleBox" class="photoFrame">
+        <img id="circleImg" alt="color circle" src="circle.jpg">
         <p>Color Circle</p>
       </div>
     </div>
@@ -357,19 +408,15 @@ input[type="range"]:hover::-webkit-slider-thumb {
       <p id="longConeHueVal">0°</p>
     </div>
     <div style="text-align: right;">
-      <p id="whiteBalanceVal">±0 μ</p>
+      <p id="whiteBalanceVal">±0μ</p>
     </div>
-  </div>
-  <div class="sliderGroup">
-    <p class="groupLabel">Warm Color [R]</p>
-    <input id="longConeSlider" type="range" min="-180" value="0" max="179">
-  </div>
-  <div id="mainImgBox">
-    <img id="mainImg" alt="Main Image" src="">
   </div>
   <div class="sliderGroup">
     <p class="groupLabel">Cool Color [G, G+B, B]</p>
     <input id="protoanSlider" type="range" min="0" value="180" max="359">
+  </div>
+  <div id="mainImgBox">
+    <img id="mainImg" alt="Main Image" src="black.png">
   </div>
   <div id="buttonBox" class="splitView">
     <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
@@ -384,18 +431,51 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <button id="btnSave" class="button"><span class="material-symbols-outlined">download</span><br>Save</button>
   </div>
   <div class="sliderGroup">
+    <p class="groupLabel">Warm Color [R]</p>
+    <input id="longConeSlider" type="range" min="-180" value="0" max="179">
+  </div>
+  <div class="sliderGroup">
     <p class="groupLabel">White Balance</p>
     <input id="wbSlider" type="range" min="-100" value="0" max="100">
   </div>
   <div class="splitView">
     <div class="photoFrame">
-      <img id="originalImg" alt="" src="">
+      <img id="originalImg" alt="" src="black.png">
       <p>Original</p>
     </div>
     <div class="photoFrame">
-      <img id="afterWB" alt="" src="">
+      <img id="afterWB" alt="" src="black.png">
       <p>After White Balance</p>
     </div>
+  </div>
+
+  <div class="history">
+    <p>Historical Technicolor Films:</p>
+    <div class="photoFrame">
+      <img alt="tollSea" loading="lazy" src="technicolor_tollsea_1922.jpg">
+      <p>The Toll of the Sea, 1922</p>
+      <p>Anna May Wong <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Anna_May_Wong_signature.svg" alt="signature" style="height: 5em; width: auto; display: inline; vertical-align: middle; filter: invert(1);"> and Kenneth Harlan</p>
+    </div>
+    <div class="photoFrame">
+      <img alt="phantom" loading="lazy" src="technicolor_phantom_1925.jpg">
+      <p>The Phantom of the Opera, 1925</p>
+      <p>Primarily black and white with select sequences filmed in two-strip Technicolor, including the masquerade ball where the Phantom's red death costume was dramatically revealed in color.</p>
+    </div>
+    <div class="photoFrame">
+      <img alt="bride" loading="lazy" src="technicolor_bride_1930.jpg">
+      <p>Bride of the Regiment, 1930</p>
+      <p>A musical operetta filmed entirely in two-strip Technicolor, starring Myrna Loy and Walter Pidgeon.</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #30363d; text-align: left; align-self: flex-start; width: 100%;">
+    <p><strong>See also</strong></p>
+    <ul style="list-style: none; padding-left: 0;">
+      <li><a href="https://en.wikipedia.org/wiki/List_of_color_film_systems" target="_blank" style="color: #58a6ff; text-decoration: none;">List of color film systems</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Technicolor#Two-color_Technicolor" target="_blank" style="color: #58a6ff; text-decoration: none;">Two-color Technicolor</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Kinemacolor" target="_blank" style="color: #58a6ff; text-decoration: none;">Kinemacolor</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Dichromacy" target="_blank" style="color: #58a6ff; text-decoration: none;">Dichromacy</a></li>
+    </ul>
   </div>
 
 </div>
@@ -409,6 +489,33 @@ let currentImageSrc = null;
 let btnInfo = false;
 let btnWB = false;
 let channelMode = 'G'; // 'G', 'B', or 'GB'
+
+// Image processing cache
+let imageCache = {
+  currentSrc: null,
+  original: null,
+  channels: { R: null, G: null, B: null, GB: null },
+  afterWB: null,
+  lastWBValue: null,
+  lastWBButtonState: null,
+  lastInfoButtonState: null,
+  lastHueValues: null,
+  lastChannelMode: null
+};
+
+function clearImageCache() {
+  imageCache = {
+    currentSrc: null,
+    original: null,
+    channels: { R: null, G: null, B: null, GB: null },
+    afterWB: null,
+    lastWBValue: null,
+    lastWBButtonState: null,
+    lastInfoButtonState: null,
+    lastHueValues: null,
+    lastChannelMode: null
+  };
+}
 
 // Working filter functions from index12.html
 function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
@@ -444,6 +551,23 @@ function hsv2rgb(h, s, v) {
   return { r: (r1 + m) * 255, g: (g1 + m) * 255, b: (b1 + m) * 255 };
 }
 
+function hueToHex(hue) {
+  const {r, g, b} = hsv2rgb(hue, 1, 1);
+  const toHex = (c) => Math.round(c).toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function updateHueColors() {
+  // Color the protoan hue value
+  const protoanHue = parseFloat(document.getElementById('protoanHueVal').textContent.replace('°', ''));
+  document.getElementById('protoanHueVal').style.color = hueToHex(protoanHue);
+  
+  // Color the long cone hue value (convert displayed negative values back to 0-360 range)
+  const longConeDisplayed = parseFloat(document.getElementById('longConeHueVal').textContent.replace('°', ''));
+  const longConeActual = longConeDisplayed < 0 ? longConeDisplayed + 360 : longConeDisplayed;
+  document.getElementById('longConeHueVal').style.color = hueToHex(longConeActual);
+}
+
 function normalize255(o) {
   const s = o.r + o.g + o.b;
   if (!s) return { r: 0, g: 0, b: 0 };
@@ -463,6 +587,9 @@ function computeOverlays() {
   document.getElementById('longConeHueVal').textContent = displayHueL + '°';
   
   document.getElementById('protoanHueVal').textContent = hueM.toFixed(0) + '°';
+  
+  // Update colors for the hue values
+  updateHueColors();
   
   const oL = normalize255(hsv2rgb(hueL, 1, 1));
   const oM = normalize255(hsv2rgb(hueM, 1, 1));
@@ -536,7 +663,7 @@ function applyWhiteBalance(ctx, canvas) {
   const Mt = M0 + deltaM;
   const K = 1000000 / Mt;
   
-  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
   
   const rgb = kelvinToRgb(K);
   const gR = rgb.r / 255, gG = rgb.g / 255, gB = rgb.b / 255;
@@ -625,54 +752,116 @@ function extractColorChannel(ctx, canvas, channel) {
 function updateAllDisplays() {
   if (!currentImageSrc) return;
   
-  // Update main image with all filters
-  processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
-    // Only apply white balance if WB button is ON
-    if (btnWB) {
-      applyWhiteBalance(ctx, canvas);
-    }
-    applyHueOverlays(ctx, canvas);
+  // Clear cache if image source changed
+  if (imageCache.currentSrc !== currentImageSrc) {
+    clearImageCache();
+    imageCache.currentSrc = currentImageSrc;
+  }
+  
+  // Process original image (cache once per image load)
+  if (!imageCache.original) {
+    processImage(currentImageSrc, 'originalImg');
+    // Use setTimeout to ensure canvas processing completes before caching
+    setTimeout(() => {
+      imageCache.original = document.getElementById('originalImg').src;
+    }, 100);
+  } else {
+    // Always use cached original - never affected by button states
+    document.getElementById('originalImg').src = imageCache.original;
+  }
+  
+  // Process color channels (cache once per image)
+  if (!imageCache.channels.R) {
+    processImage(currentImageSrc, 'monoR', (ctx, canvas) => extractColorChannel(ctx, canvas, 'red'));
+    processImage(currentImageSrc, 'monoG', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green'));
+    processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
+    processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
     
-    // Add filename overlay if Info button is ON
-    if (btnInfo) {
-      const mode = channelMode === 'GB' ? 'C' : channelMode;
-      const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
-      const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
-      const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace(' μ', '').replace('μ', '');
-      
-      const longConeValue = parseInt(longConeRaw);
-      const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
-      const wbValue = parseInt(wbCleaned.replace('-', ''));
-      const includeWB = btnWB && wbValue !== 0;
-      
-      let filename = `dichromatic_${mode}${protoanDisplayed}`;
-      if (longConeValue !== 0 || includeWB) {
-        filename += `_R${longConeRaw}`;
+    // Cache the results
+    setTimeout(() => {
+      imageCache.channels.R = document.getElementById('monoR').src;
+      imageCache.channels.G = document.getElementById('monoG').src;
+      imageCache.channels.B = document.getElementById('monoB').src;
+      imageCache.channels.GB = document.getElementById('monoGB').src;
+    }, 100);
+  } else {
+    document.getElementById('monoR').src = imageCache.channels.R;
+    document.getElementById('monoG').src = imageCache.channels.G;
+    document.getElementById('monoB').src = imageCache.channels.B;
+    document.getElementById('monoGB').src = imageCache.channels.GB;
+  }
+  
+  // Get current values and check what changed
+  const currentWBValue = +document.getElementById('wbSlider').value;
+  const currentHueValues = [
+    +document.getElementById('longConeSlider').value,
+    +document.getElementById('protoanSlider').value
+  ];
+  
+  const wbChanged = currentWBValue !== imageCache.lastWBValue;
+  const wbButtonChanged = btnWB !== imageCache.lastWBButtonState;
+  const infoButtonChanged = btnInfo !== imageCache.lastInfoButtonState;
+  const hueChanged = !imageCache.lastHueValues || 
+    currentHueValues[0] !== imageCache.lastHueValues[0] || 
+    currentHueValues[1] !== imageCache.lastHueValues[1];
+  const channelChanged = channelMode !== imageCache.lastChannelMode;
+  
+  // Process white balance preview (only when WB value changes)
+  if (wbChanged) {
+    processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
+    setTimeout(() => {
+      imageCache.afterWB = document.getElementById('afterWB').src;
+    }, 100);
+  } else if (imageCache.afterWB) {
+    document.getElementById('afterWB').src = imageCache.afterWB;
+  }
+  
+  // Process main image (when hue values, channel mode, WB value, WB button, or Info button changes)
+  if (hueChanged || channelChanged || wbChanged || wbButtonChanged || infoButtonChanged) {
+    processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
+      // Only apply white balance if WB button is ON
+      if (btnWB) {
+        applyWhiteBalance(ctx, canvas);
       }
-      if (includeWB) {
-        filename += `_U${wbCleaned}`;
-      }
+      applyHueOverlays(ctx, canvas);
       
-      ctx.fillStyle = "white";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 2;
-      ctx.font = "16px monospace";
-      ctx.strokeText(filename, 10, 25);
-      ctx.fillText(filename, 10, 25);
-    }
-  });
+      // Add filename overlay if Info button is ON
+      if (btnInfo) {
+        const mode = channelMode === 'GB' ? 'C' : channelMode;
+        const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
+        const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
+        const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace('μ', '');
+        
+        const longConeValue = parseInt(longConeRaw);
+        const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
+        const wbValue = parseInt(wbCleaned.replace('-', ''));
+        const includeWB = btnWB && wbValue !== 0;
+        
+        let filename = `dichromatic_${mode}${protoanDisplayed}`;
+        if (longConeValue !== 0 || includeWB) {
+          filename += `_R${longConeRaw}`;
+        }
+        if (includeWB) {
+          filename += `_U${wbCleaned}`;
+        }
+        
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.font = "16px monospace";
+        ctx.strokeText(filename, 10, 25);
+        ctx.fillText(filename, 10, 25);
+      }
+    });
+    
+    imageCache.lastHueValues = currentHueValues;
+    imageCache.lastChannelMode = channelMode;
+  }
   
-  // Update original
-  processImage(currentImageSrc, 'originalImg');
-  
-  // Update after WB - always show white balance effect (preview)
-  processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
-  
-  // Update color channels
-  processImage(currentImageSrc, 'monoR', (ctx, canvas) => extractColorChannel(ctx, canvas, 'red'));
-  processImage(currentImageSrc, 'monoG', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green'));
-  processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
-  processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
+  // Update cache values after all processing
+  imageCache.lastWBValue = currentWBValue;
+  imageCache.lastWBButtonState = btnWB;
+  imageCache.lastInfoButtonState = btnInfo;
 }
 
 // Channel button functions
@@ -794,16 +983,19 @@ wbSlider.addEventListener("input", () => {
   const v = +document.getElementById('wbSlider').value;
   const M0 = 1000000 / 6500; // ≈154 μ
   const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
-  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
-  
-  // Animate the white balance number
-  animateNumber('whiteBalanceVal');
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
   
   if (!btnWB) {
     setWB(true);
   }
   updateAllDisplays();
 });
+
+// White balance slider animations
+wbSlider.addEventListener("mousedown", () => startScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("touchstart", () => startScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("mouseup", () => endScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("touchend", () => endScanAnimation('whiteBalanceVal'));
 
 // Upload buttons
 const uploadBtn = document.getElementById("btnUpload");
@@ -824,6 +1016,7 @@ fileInput.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   currentImageSrc = URL.createObjectURL(file);
+  clearImageCache();
   updateAllDisplays();
 });
 
@@ -831,6 +1024,7 @@ fileInputSample.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   currentImageSrc = URL.createObjectURL(file);
+  clearImageCache();
   updateAllDisplays();
 });
 
@@ -842,7 +1036,7 @@ document.getElementById("btnSave").addEventListener("click", () => {
     const mode = channelMode === 'GB' ? 'C' : channelMode;
     const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
     const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
-    const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace(' μ', '').replace('μ', '');
+    const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace('μ', '');
     
     // Parse values
     const longConeValue = parseInt(longConeRaw);
@@ -875,60 +1069,87 @@ document.getElementById("btnSave").addEventListener("click", () => {
 });
 
 // Slider updates
-document.getElementById("longConeSlider").addEventListener("input", () => {
-  animateNumber('longConeHueVal');
-  updateSliderGradients();
-  updateAllDisplays();
-});
-document.getElementById("protoanSlider").addEventListener("input", () => {
-  animateNumber('protoanHueVal');
+const longConeSlider = document.getElementById("longConeSlider");
+const protoanSlider = document.getElementById("protoanSlider");
+
+longConeSlider.addEventListener("input", () => {
   updateSliderGradients();
   updateAllDisplays();
 });
 
+protoanSlider.addEventListener("input", () => {
+  updateSliderGradients();
+  updateAllDisplays();
+});
+
+// Animation based on mouse/touch interaction
+longConeSlider.addEventListener("mousedown", () => startScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("touchstart", () => startScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("mouseup", () => endScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("touchend", () => endScanAnimation('longConeHueVal'));
+
+protoanSlider.addEventListener("mousedown", () => startScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("touchstart", () => startScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("mouseup", () => endScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("touchend", () => endScanAnimation('protoanHueVal'));
+
 // Animation functions for big numbers
-function animateNumber(elementId) {
+function startScanAnimation(elementId) {
   const el = document.getElementById(elementId);
   if (el) {
     el.style.animation = 'none';
     void el.offsetWidth; // Force reflow
-    el.style.animation = 'morph0 0.3s cubic-bezier(0.9,0,0.1,1) forwards';
-    
-    setTimeout(() => {
-      el.style.animation = 'morph 0.5s cubic-bezier(0.9,0,0.1,1) forwards';
-    }, 300);
+    el.style.animation = 'morph 0.3s cubic-bezier(0.9,0,0.1,1) forwards';
+  }
+}
+
+function endScanAnimation(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.style.animation = 'morph0 0.5s cubic-bezier(0.9,0,0.1,1) forwards';
   }
 }
 
 // Sample image clicks
 document.getElementById("colorCheckerBox").addEventListener("click", () => {
   currentImageSrc = document.getElementById("colorCheckerImg").src;
+  clearImageCache();
   updateAllDisplays();
 });
 
 document.getElementById("colorBarsBox").addEventListener("click", () => {
   currentImageSrc = document.getElementById("colorBarsImg").src;
+  clearImageCache();
   updateAllDisplays();
 });
 
-document.getElementById("yosemiteBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("yosemiteImg").src;
+document.getElementById("circleBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("circleImg").src;
+  clearImageCache();
   updateAllDisplays();
 });
 
 // Initialize display values
-document.getElementById("whiteBalanceVal").textContent = "±0 μ";
+document.getElementById("whiteBalanceVal").textContent = "±0μ";
 computeOverlays();
 updateSliderGradients();
 
 // Initialize channel mode
 setChannelMode('G');
 
+// Set black.png placeholders for all image previews (after initialization)
+document.getElementById('monoR').src = 'black.png';
+document.getElementById('monoG').src = 'black.png';
+document.getElementById('monoB').src = 'black.png';
+document.getElementById('monoGB').src = 'black.png';
+document.getElementById('originalImg').src = 'black.png';
+document.getElementById('afterWB').src = 'black.png';
+
 // Initialize white balance display
 const v = +document.getElementById('wbSlider').value;
 const M0 = 1000000 / 6500; // ≈154 μ
 const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
-document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
 
 // Make Red channel always highlighted and unclickable
 const redFrame = document.querySelector('#monoR').parentElement;
