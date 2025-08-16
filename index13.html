@@ -298,16 +298,16 @@ input[type="range"]:hover::-webkit-slider-thumb {
         <p>Mosaic</p>
       </div>
       <div id="colorCheckerBox" class="photoFrame">
-        <img id="colorCheckerImg" alt="colorful pattern" src="" crossorigin="anonymous">
-        <p>Checker</p>
+        <img id="colorCheckerImg" alt="color checker" src="" crossorigin="anonymous">
+        <p>Color Checker</p>
       </div>
       <div id="colorBarsBox" class="photoFrame">
         <img id="colorBarsImg" alt="color bars" src="" crossorigin="anonymous">
         <p>Bars</p>
       </div>
       <div id="yosemiteBox" class="photoFrame">
-        <img id="yosemiteImg" alt="landscape" src="" crossorigin="anonymous">
-        <p>Gradient</p>
+        <img id="yosemiteImg" alt="color circle" src="" crossorigin="anonymous">
+        <p>Color Circle</p>
       </div>
     </div>
   </div>
@@ -475,6 +475,12 @@ function applyHueOverlays(ctx, canvas) {
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const d = imageData.data;
   
+  // Debug: log overlay values once per mode change
+  if (window.lastChannelMode !== channelMode) {
+    console.log(`Mode ${channelMode}: oL=[${oL.r.toFixed(1)},${oL.g.toFixed(1)},${oL.b.toFixed(1)}], oM=[${oM.r.toFixed(1)},${oM.g.toFixed(1)},${oM.b.toFixed(1)}], oS=[${oS.r.toFixed(1)},${oS.g.toFixed(1)},${oS.b.toFixed(1)}]`);
+    window.lastChannelMode = channelMode;
+  }
+  
   for (let i = 0; i < d.length; i += 4) {
     const L = d[i]; // Always RED channel
     let M, S;
@@ -489,6 +495,11 @@ function applyHueOverlays(ctx, canvas) {
     } else if (channelMode === 'GB') {
       M = (d[i + 1] + d[i + 2]) / 2; // (GREEN + BLUE) / 2
       S = (L + M) / 2; // (RED + (GREEN+BLUE)/2) / 2
+    }
+    
+    // Debug bright pixels
+    if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240 && Math.random() < 0.0001) {
+      console.log(`Bright pixel [${channelMode}]: RGB=[${d[i]},${d[i+1]},${d[i+2]}] → L=${L}, M=${M.toFixed(1)}, S=${S.toFixed(1)}`);
     }
     
     const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
@@ -763,9 +774,9 @@ document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : ''
 
 // Create and load sample patterns
 document.getElementById('mosaic').src = createPattern('mosaic');
-document.getElementById('colorCheckerImg').src = createPattern('checker');
+document.getElementById('colorCheckerImg').src = 'https://upload.wikimedia.org/wikipedia/commons/a/ad/Gretag-Macbeth_ColorChecker.jpg';
 document.getElementById('colorBarsImg').src = createPattern('bars');
-document.getElementById('yosemiteImg').src = createPattern('gradient');
+document.getElementById('yosemiteImg').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Color_circle_%28RGB%29.svg/960px-Color_circle_%28RGB%29.svg.png';
 </script>
 </body>
 </html>
