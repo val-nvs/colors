@@ -253,7 +253,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
     <div id="buttonGroup">
       <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
-      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>GB</button>
+      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>C</button>
       <button id="btnB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>B</button>
     </div>
     <button id="btnInfo" class="button"><span class="material-symbols-outlined">pageview</span><br>Info</button>
@@ -477,7 +477,8 @@ function applyHueOverlays(ctx, canvas) {
   
   // Debug: log overlay values once per mode change
   if (window.lastChannelMode !== channelMode) {
-    console.log(`Mode ${channelMode}: oL=[${oL.r.toFixed(1)},${oL.g.toFixed(1)},${oL.b.toFixed(1)}], oM=[${oM.r.toFixed(1)},${oM.g.toFixed(1)},${oM.b.toFixed(1)}], oS=[${oS.r.toFixed(1)},${oS.g.toFixed(1)},${oS.b.toFixed(1)}]`);
+    const displayMode = channelMode === 'GB' ? 'C' : channelMode;
+    console.log(`Mode ${displayMode}: oL=[${oL.r.toFixed(1)},${oL.g.toFixed(1)},${oL.b.toFixed(1)}], oM=[${oM.r.toFixed(1)},${oM.g.toFixed(1)},${oM.b.toFixed(1)}], oS=[${oS.r.toFixed(1)},${oS.g.toFixed(1)},${oS.b.toFixed(1)}]`);
     window.lastChannelMode = channelMode;
   }
   
@@ -499,7 +500,8 @@ function applyHueOverlays(ctx, canvas) {
     
     // Debug bright pixels
     if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240 && Math.random() < 0.0001) {
-      console.log(`Bright pixel [${channelMode}]: RGB=[${d[i]},${d[i+1]},${d[i+2]}] → L=${L}, M=${M.toFixed(1)}, S=${S.toFixed(1)}`);
+      const displayMode = channelMode === 'GB' ? 'C' : channelMode;
+      console.log(`Bright pixel [${displayMode}]: RGB=[${d[i]},${d[i+1]},${d[i+2]}] → L=${L}, M=${M.toFixed(1)}, S=${S.toFixed(1)}`);
     }
     
     const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
@@ -560,6 +562,34 @@ function updateAllDisplays() {
       applyWhiteBalance(ctx, canvas);
     }
     applyHueOverlays(ctx, canvas);
+    
+    // Add filename overlay if Info button is ON
+    if (btnInfo) {
+      const mode = channelMode === 'GB' ? 'C' : channelMode;
+      const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
+      const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
+      const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace(' μ', '').replace('μ', '');
+      
+      const longConeValue = parseInt(longConeRaw);
+      const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
+      const wbValue = parseInt(wbCleaned.replace('-', ''));
+      const includeWB = btnWB && wbValue !== 0;
+      
+      let filename = `dichromatic_${mode}${protoanDisplayed}`;
+      if (longConeValue !== 0 || includeWB) {
+        filename += `_R${longConeRaw}`;
+      }
+      if (includeWB) {
+        filename += `_U${wbCleaned}`;
+      }
+      
+      ctx.fillStyle = "white";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 2;
+      ctx.font = "16px monospace";
+      ctx.strokeText(filename, 10, 25);
+      ctx.fillText(filename, 10, 25);
+    }
   });
   
   // Update original
@@ -584,9 +614,12 @@ function setChannelMode(mode) {
   const btnGB = document.getElementById("btnGB");
   const btnB = document.getElementById("btnB");
   
-  // Reset all buttons
+  // Reset all buttons to off state
+  btnG.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>G';
+  btnGB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>C';
+  btnB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>B';
+  
   [btnG, btnGB, btnB].forEach(btn => {
-    btn.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>' + btn.innerHTML.split('<br>')[1];
     btn.style.backgroundColor = "#464646";
     btn.style.color = "#fff";
     btn.style.boxShadow = "0 0 0rem #f0f";
@@ -594,12 +627,18 @@ function setChannelMode(mode) {
   
   // Set active button
   let activeBtn;
-  if (mode === 'G') activeBtn = btnG;
-  else if (mode === 'GB') activeBtn = btnGB;
-  else if (mode === 'B') activeBtn = btnB;
+  if (mode === 'G') {
+    activeBtn = btnG;
+    btnG.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>G';
+  } else if (mode === 'GB') {
+    activeBtn = btnGB;
+    btnGB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>C';
+  } else if (mode === 'B') {
+    activeBtn = btnB;
+    btnB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>B';
+  }
   
   if (activeBtn) {
-    activeBtn.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>' + activeBtn.innerHTML.split('<br>')[1];
     activeBtn.style.backgroundColor = "#d4d4d4";
     activeBtn.style.color = "#000";
     activeBtn.style.boxShadow = "0 0 0.5rem #fff";
@@ -626,6 +665,7 @@ document.getElementById("btnInfo").addEventListener("click", function() {
     this.style.color = "#fff";
     this.style.boxShadow = "0 0 0rem #f0f";
   }
+  updateAllDisplays(); // Refresh image to show/hide overlay
 });
 
 // WB button and slider
@@ -685,8 +725,37 @@ fileInput.addEventListener("change", e => {
 document.getElementById("btnSave").addEventListener("click", () => {
   const mainImg = document.getElementById("mainImg");
   if (mainImg.src) {
+    // Get displayed values from top of page
+    const mode = channelMode === 'GB' ? 'C' : channelMode;
+    const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
+    const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
+    const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace(' μ', '').replace('μ', '');
+    
+    // Parse values
+    const longConeValue = parseInt(longConeRaw);
+    const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
+    const wbValue = parseInt(wbCleaned.replace('-', ''));
+    
+    // Check if WB is active and not zero
+    const includeWB = btnWB && wbValue !== 0;
+    
+    // Build filename conditionally
+    let filename = `dichromatic_${mode}${protoanDisplayed}`;
+    
+    // Add R if not zero OR if U will be included
+    if (longConeValue !== 0 || includeWB) {
+      filename += `_R${longConeRaw}`;
+    }
+    
+    // Add U only if WB button is active and value is not zero
+    if (includeWB) {
+      filename += `_U${wbCleaned}`;
+    }
+    
+    filename += '.png';
+    
     const link = document.createElement("a");
-    link.download = "filtered-image.png";
+    link.download = filename;
     link.href = mainImg.src;
     link.click();
   }
