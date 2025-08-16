@@ -131,11 +131,11 @@ button:focus {
 }
 
 #protoanSlider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  height: 0.2rem;
 }
 
 #longConeSlider::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #0ff, #00f, #f0f, #f00, #ff0, #0f0, #0ff);
+  height: 0.2rem;
 }
 
 #wbSlider::-webkit-slider-runnable-track {
@@ -311,22 +311,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
       </div>
     </div>
   </div>
-  <div class="history">
-    <div class="photoFrame">
-      <img id="" alt="red pattern" loading="lazy" src="" crossorigin="anonymous">
-      <p>Red Gradient</p>
-      <p>Test Pattern</p>
-    </div>
-    <div class="photoFrame">
-      <img id="" alt="green pattern" loading="lazy" src="" crossorigin="anonymous">
-      <p>Green Gradient</p>
-    </div>
-    <div class="photoFrame">
-      <img id="" alt="blue pattern" loading="lazy" src="" crossorigin="anonymous">
-      <p>Blue Gradient</p>
-      <p>Color Test</p>
-    </div>
-  </div>
+
 </div>
 
 <!-- Hidden canvas for processing -->
@@ -398,6 +383,35 @@ function computeOverlays() {
   };
   
   return { oL, oM, oS: normalize255(rawS) };
+}
+
+function updateSliderGradients() {
+  const L = +document.getElementById('longConeSlider').value;
+  const M = +document.getElementById('protoanSlider').value;
+  
+  // Convert hues to RGB for gradients
+  const hueToRgb = (h) => {
+    const {r, g, b} = hsv2rgb(h, 1, 0.8);
+    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+  };
+  
+  // Long cone slider: 6 colors across its range (-180 to 179)
+  // Positions: -180, -108, -36, 36, 108, 179
+  const longHues = [180, 252, 324, 36, 108, 179]; // normalized to 0-360
+  const longColors = longHues.map(h => hueToRgb(h));
+  document.getElementById('longConeSlider').style.background = 
+    `linear-gradient(to right, ${longColors.join(', ')})`;
+  
+  // Protoan slider: 6 colors showing resulting hueM values based on current hueL
+  const hueL = ((L % 360) + 360) % 360;
+  const protPositions = [0, 60, 120, 180, 240, 300]; // 6 evenly spaced positions in range 0-359
+  const protHues = protPositions.map(pos => {
+    const delta = 120 + (pos / 359) * 120;
+    return (hueL + delta) % 360;
+  });
+  const protColors = protHues.map(h => hueToRgb(h));
+  document.getElementById('protoanSlider').style.background = 
+    `linear-gradient(to right, ${protColors.join(', ')})`;
 }
 
 // Canvas processing functions
@@ -613,8 +627,14 @@ document.getElementById("btnSave").addEventListener("click", () => {
 });
 
 // Slider updates
-document.getElementById("longConeSlider").addEventListener("input", updateAllDisplays);
-document.getElementById("protoanSlider").addEventListener("input", updateAllDisplays);
+document.getElementById("longConeSlider").addEventListener("input", () => {
+  updateSliderGradients();
+  updateAllDisplays();
+});
+document.getElementById("protoanSlider").addEventListener("input", () => {
+  updateSliderGradients();
+  updateAllDisplays();
+});
 
 // Sample image clicks
 document.getElementById("mosaicBox").addEventListener("click", () => {
@@ -637,94 +657,45 @@ document.getElementById("yosemiteBox").addEventListener("click", () => {
   updateAllDisplays();
 });
 
-// Create sample patterns
-function createMosaicPattern() {
+// Simple pattern generation
+function createPattern(type) {
   const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
+  canvas.width = canvas.height = 200;
   const ctx = canvas.getContext('2d');
   
-  for (let x = 0; x < canvas.width; x += 20) {
-    for (let y = 0; y < canvas.height; y += 20) {
-      const hue = (x + y) % 360;
-      ctx.fillStyle = `hsl(${hue}, 80%, 50%)`;
-      ctx.fillRect(x, y, 20, 20);
+  if (type === 'mosaic') {
+    for (let i = 0; i < 100; i++) {
+      ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 50%)`;
+      ctx.fillRect(Math.random() * 180, Math.random() * 180, 20, 20);
     }
-  }
-  return canvas.toDataURL();
-}
-
-function createCheckerPattern() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
-  const ctx = canvas.getContext('2d');
-  
-  const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-  for (let x = 0; x < canvas.width; x += 40) {
-    for (let y = 0; y < canvas.height; y += 40) {
-      const colorIndex = ((x / 40) + (y / 40)) % colors.length;
-      ctx.fillStyle = colors[colorIndex];
-      ctx.fillRect(x, y, 40, 40);
+  } else if (type === 'checker') {
+    const colors = ['#f00', '#0f0', '#00f', '#ff0'];
+    for (let x = 0; x < 200; x += 50) {
+      for (let y = 0; y < 200; y += 50) {
+        ctx.fillStyle = colors[((x + y) / 50) % 4];
+        ctx.fillRect(x, y, 50, 50);
+      }
     }
+  } else if (type === 'bars') {
+    ['#f00', '#f80', '#ff0', '#0f0', '#08f', '#00f', '#80f'].forEach((c, i) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(i * 28, 0, 28, 200);
+    });
+  } else {
+    const g = ctx.createLinearGradient(0, 0, 200, 200);
+    g.addColorStop(0, '#f00');
+    g.addColorStop(0.5, '#0f0');
+    g.addColorStop(1, '#00f');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 200, 200);
   }
-  return canvas.toDataURL();
-}
-
-function createBarsPattern() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
-  const ctx = canvas.getContext('2d');
-  
-  const colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#0080ff', '#0000ff', '#8000ff'];
-  const barWidth = canvas.width / colors.length;
-  
-  colors.forEach((color, i) => {
-    ctx.fillStyle = color;
-    ctx.fillRect(i * barWidth, 0, barWidth, canvas.height);
-  });
-  return canvas.toDataURL();
-}
-
-function createGradientPattern() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
-  const ctx = canvas.getContext('2d');
-  
-  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, '#ff0000');
-  gradient.addColorStop(0.2, '#ff8000');
-  gradient.addColorStop(0.4, '#ffff00');
-  gradient.addColorStop(0.6, '#00ff00');
-  gradient.addColorStop(0.8, '#0000ff');
-  gradient.addColorStop(1, '#8000ff');
-  
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL();
-}
-
-function createColorGradient(color) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 250;
-  const ctx = canvas.getContext('2d');
-  
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, '#ffffff');
-  gradient.addColorStop(0.5, color);
-  gradient.addColorStop(1, '#000000');
-  
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
   return canvas.toDataURL();
 }
 
 // Initialize display values
 document.getElementById("whiteBalanceVal").textContent = "±0 μ";
 computeOverlays();
+updateSliderGradients();
 
 // Initialize white balance display
 const v = +document.getElementById('wbSlider').value;
@@ -733,59 +704,10 @@ const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
 document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
 
 // Create and load sample patterns
-document.getElementById('mosaic').src = createMosaicPattern();
-document.getElementById('colorCheckerImg').src = createCheckerPattern();
-document.getElementById('colorBarsImg').src = createBarsPattern();
-document.getElementById('yosemiteImg').src = createGradientPattern();
-
-// Set up history section images
-const historyImgs = document.querySelectorAll('.history img');
-const historyColors = ['#ff0000', '#00ff00', '#0000ff'];
-historyImgs.forEach((img, index) => {
-  if (index < historyColors.length) {
-    img.src = createColorGradient(historyColors[index]);
-  }
-});
-
-// Create a default colorful test pattern
-function createDefaultPattern() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 400;
-  canvas.height = 300;
-  const ctx = canvas.getContext('2d');
-  
-  // Create a colorful gradient pattern
-  for (let x = 0; x < canvas.width; x += 50) {
-    for (let y = 0; y < canvas.height; y += 50) {
-      const hue = (x + y) % 360;
-      ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-      ctx.fillRect(x, y, 50, 50);
-    }
-  }
-  
-  // Add some geometric shapes
-  ctx.fillStyle = '#ff0000';
-  ctx.fillRect(50, 50, 100, 50);
-  
-  ctx.fillStyle = '#00ff00';
-  ctx.beginPath();
-  ctx.arc(300, 100, 40, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.fillStyle = '#0000ff';
-  ctx.beginPath();
-  ctx.moveTo(150, 200);
-  ctx.lineTo(200, 150);
-  ctx.lineTo(250, 200);
-  ctx.closePath();
-  ctx.fill();
-  
-  return canvas.toDataURL();
-}
-
-// Load default pattern
-currentImageSrc = createDefaultPattern();
-updateAllDisplays();
+document.getElementById('mosaic').src = createPattern('mosaic');
+document.getElementById('colorCheckerImg').src = createPattern('checker');
+document.getElementById('colorBarsImg').src = createPattern('bars');
+document.getElementById('yosemiteImg').src = createPattern('gradient');
 </script>
 </body>
 </html>
