@@ -7,14 +7,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Honk -->
-<link href="https://fonts.googleapis.com/css2?family=Honk:MORF@0..35&display=swap" rel="stylesheet">
-<!-- Aref Ruqaa Ink -->
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700" rel="stylesheet">
 <!-- Atkinson Hyperlegible Next -->
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
-<!-- Long Cang -->
-<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
 <!-- Material Symbols Outlined -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
@@ -34,6 +28,11 @@
 <title>Color Channel Filter</title>
 
 <style>
+@font-face {
+  font-family: "Honk";
+  src: url("Honk-VF.ttf") format("truetype");
+}
+
 html {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
@@ -49,7 +48,8 @@ html {
 
 .splitView {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.4rem;
   width: 100%;
 }
@@ -173,22 +173,6 @@ input[type="range"]:hover::-webkit-slider-thumb {
 }
 
 /* text */
-.hanBig {
-  transform: scaleY(1.7);
-  font-family: "Long Cang", serif;
-  font-size: 1rem;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.hanHalf {
-  transform: scaleY(1.0);
-  font-family: "Long Cang", serif;
-  font-size: 1rem;
-  display: inline-block;
-  vertical-align: middle;
-}
-
 .tiny {
   font-size: 0.5rem;
   word-spacing: 0.01rem;
@@ -199,6 +183,16 @@ input[type="range"]:hover::-webkit-slider-thumb {
   font-size: 5rem;
   line-height: 0.59;
   font-family: "Honk", sans-serif;
+}
+
+/* KEYFRAMES for number animation */
+@keyframes morph {
+  from { font-variation-settings: "MORF" 10; }
+  to   { font-variation-settings: "MORF" 15; }
+}
+@keyframes morph0 {
+  from { font-variation-settings: "MORF" 15; }
+  to   { font-variation-settings: "MORF" 10; }
 }
 
 .material-symbols-outlined {
@@ -239,7 +233,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
 
 <div class="pageBox">
   <div class="header splitView">
-    <div style="text-align: center;">
+    <div style="text-align: left;">
       <p style="font-size: 1rem; opacity: 0.7; margin: 0;">Cool Color [G, G+B, B]</p>
       <p id="protoanHueVal">180°</p>
     </div>
@@ -247,7 +241,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
       <p style="font-size: 1rem; opacity: 0.7; margin: 0;">Warm Color [R]</p>
       <p id="longConeHueVal">0°</p>
     </div>
-    <div style="text-align: center;">
+    <div style="text-align: right;">
       <p style="font-size: 1rem; opacity: 0.7; margin: 0;">White Balance</p>
       <p id="whiteBalanceVal">±0 μ</p>
     </div>
@@ -308,19 +302,19 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <p>Select sample image:</p>
     <div class="splitView">
       <div id="mosaicBox" class="photoFrame">
-        <img id="mosaic" alt="color mosaic" src="" crossorigin="anonymous">
+        <img id="mosaic" alt="color mosaic" src="">
         <p>Mosaic</p>
       </div>
       <div id="colorCheckerBox" class="photoFrame">
-        <img id="colorCheckerImg" alt="color checker" src="" crossorigin="anonymous">
+        <img id="colorCheckerImg" alt="color checker" src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Gretag-Macbeth_ColorChecker.jpg" crossorigin="anonymous">
         <p>Color Checker</p>
       </div>
       <div id="colorBarsBox" class="photoFrame">
-        <img id="colorBarsImg" alt="color bars" src="" crossorigin="anonymous">
+        <img id="colorBarsImg" alt="color bars" src="color_bars.png">
         <p>Bars</p>
       </div>
       <div id="yosemiteBox" class="photoFrame">
-        <img id="yosemiteImg" alt="color circle" src="" crossorigin="anonymous">
+        <img id="yosemiteImg" alt="color circle" src="circle.jpg">
         <p>Color Circle</p>
       </div>
     </div>
@@ -453,9 +447,6 @@ function processImage(imgSrc, targetImgId, processFunc) {
     const dataUrl = canvas.toDataURL();
     document.getElementById(targetImgId).src = dataUrl;
   };
-  img.onerror = function() {
-    console.log('Error loading image:', imgSrc);
-  };
   img.src = imgSrc;
 }
 
@@ -489,13 +480,6 @@ function applyHueOverlays(ctx, canvas) {
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const d = imageData.data;
   
-  // Debug: log overlay values once per mode change
-  if (window.lastChannelMode !== channelMode) {
-    const displayMode = channelMode === 'GB' ? 'C' : channelMode;
-    console.log(`Mode ${displayMode}: oL=[${oL.r.toFixed(1)},${oL.g.toFixed(1)},${oL.b.toFixed(1)}], oM=[${oM.r.toFixed(1)},${oM.g.toFixed(1)},${oM.b.toFixed(1)}], oS=[${oS.r.toFixed(1)},${oS.g.toFixed(1)},${oS.b.toFixed(1)}]`);
-    window.lastChannelMode = channelMode;
-  }
-  
   for (let i = 0; i < d.length; i += 4) {
     const L = d[i]; // Always RED channel
     let M, S;
@@ -510,12 +494,6 @@ function applyHueOverlays(ctx, canvas) {
     } else if (channelMode === 'GB') {
       M = (d[i + 1] + d[i + 2]) / 2; // (GREEN + BLUE) / 2
       S = (L + M) / 2; // (RED + (GREEN+BLUE)/2) / 2
-    }
-    
-    // Debug bright pixels
-    if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240 && Math.random() < 0.0001) {
-      const displayMode = channelMode === 'GB' ? 'C' : channelMode;
-      console.log(`Bright pixel [${displayMode}]: RGB=[${d[i]},${d[i+1]},${d[i+2]}] → L=${L}, M=${M.toFixed(1)}, S=${S.toFixed(1)}`);
     }
     
     const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
@@ -671,7 +649,6 @@ document.getElementById("btnB").addEventListener("click", () => setChannelMode('
 // Info button
 document.getElementById("btnInfo").addEventListener("click", function() {
   btnInfo = !btnInfo;
-  console.log(btnInfo ? "info is ON" : "info is OFF");
   if (btnInfo) {
     this.style.backgroundColor = "#c9d1d9";
     this.style.borderColor = "#c9d1d9";
@@ -708,7 +685,6 @@ function setWB(on) {
 
 wbButton.addEventListener("click", () => {
   setWB(!btnWB);
-  console.log(btnWB ? "Button is ON" : "Button is OFF");
 });
 
 wbSlider.addEventListener("input", () => {
@@ -718,9 +694,11 @@ wbSlider.addEventListener("input", () => {
   const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
   document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
   
+  // Animate the white balance number
+  animateNumber('whiteBalanceVal');
+  
   if (!btnWB) {
     setWB(true);
-    console.log("WB Button turned ON by slider");
   }
   updateAllDisplays();
 });
@@ -783,13 +761,29 @@ document.getElementById("btnSave").addEventListener("click", () => {
 
 // Slider updates
 document.getElementById("longConeSlider").addEventListener("input", () => {
+  animateNumber('longConeHueVal');
   updateSliderGradients();
   updateAllDisplays();
 });
 document.getElementById("protoanSlider").addEventListener("input", () => {
+  animateNumber('protoanHueVal');
   updateSliderGradients();
   updateAllDisplays();
 });
+
+// Animation functions for big numbers
+function animateNumber(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.style.animation = 'none';
+    void el.offsetWidth; // Force reflow
+    el.style.animation = 'morph0 0.3s cubic-bezier(0.9,0,0.1,1) forwards';
+    
+    setTimeout(() => {
+      el.style.animation = 'morph 0.5s cubic-bezier(0.9,0,0.1,1) forwards';
+    }, 300);
+  }
+}
 
 // Sample image clicks
 document.getElementById("mosaicBox").addEventListener("click", () => {
@@ -818,31 +812,9 @@ function createPattern(type) {
   canvas.width = canvas.height = 200;
   const ctx = canvas.getContext('2d');
   
-  if (type === 'mosaic') {
-    for (let i = 0; i < 100; i++) {
-      ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 50%)`;
-      ctx.fillRect(Math.random() * 180, Math.random() * 180, 20, 20);
-    }
-  } else if (type === 'checker') {
-    const colors = ['#f00', '#0f0', '#00f', '#ff0'];
-    for (let x = 0; x < 200; x += 50) {
-      for (let y = 0; y < 200; y += 50) {
-        ctx.fillStyle = colors[((x + y) / 50) % 4];
-        ctx.fillRect(x, y, 50, 50);
-      }
-    }
-  } else if (type === 'bars') {
-    ['#f00', '#f80', '#ff0', '#0f0', '#08f', '#00f', '#80f'].forEach((c, i) => {
-      ctx.fillStyle = c;
-      ctx.fillRect(i * 28, 0, 28, 200);
-    });
-  } else {
-    const g = ctx.createLinearGradient(0, 0, 200, 200);
-    g.addColorStop(0, '#f00');
-    g.addColorStop(0.5, '#0f0');
-    g.addColorStop(1, '#00f');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 200, 200);
+  for (let i = 0; i < 100; i++) {
+    ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 50%)`;
+    ctx.fillRect(Math.random() * 180, Math.random() * 180, 20, 20);
   }
   return canvas.toDataURL();
 }
@@ -861,11 +833,8 @@ const M0 = 1000000 / 6500; // ≈154 μ
 const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
 document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
 
-// Create and load sample patterns
-document.getElementById('mosaic').src = createPattern('mosaic');
-document.getElementById('colorCheckerImg').src = 'https://upload.wikimedia.org/wikipedia/commons/a/ad/Gretag-Macbeth_ColorChecker.jpg';
-document.getElementById('colorBarsImg').src = './color_bars.png';
-document.getElementById('yosemiteImg').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Color_circle_%28RGB%29.svg/960px-Color_circle_%28RGB%29.svg.png';
+// Create and load generated patterns only
+document.getElementById('mosaic').src = createPattern();
 </script>
 </body>
 </html>
