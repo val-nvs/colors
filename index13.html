@@ -227,6 +227,29 @@ input[type="range"]:hover::-webkit-slider-thumb {
   background-color: #262c36;
   border-color: #586069;
 }
+
+/* Channel preview boxes are clickable */
+#greenFrame, #greenBlueFrame, #blueFrame {
+  cursor: pointer;
+}
+
+#greenFrame:hover, #greenBlueFrame:hover, #blueFrame:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+/* Red channel always highlighted and unclickable */
+.red-channel-disabled {
+  border: 2px solid #c9d1d9 !important;
+  box-shadow: 0 0 0.5rem rgba(201, 209, 217, 0.5) !important;
+  cursor: not-allowed !important;
+}
+
+.red-channel-disabled:hover {
+  background-color: #30363d !important;
+  border-color: #c9d1d9 !important;
+  cursor: not-allowed !important;
+}
 </style>
 </head>
 <body>
@@ -285,17 +308,17 @@ input[type="range"]:hover::-webkit-slider-thumb {
       <img id="monoR" alt="" src="">
       <p>Red</p>
     </div>
-    <div class="photoFrame">
+    <div class="photoFrame" id="greenFrame">
       <img id="monoG" alt="" src="">
       <p>Green</p>
     </div>
-    <div class="photoFrame">
-      <img id="monoB" alt="" src="">
-      <p>Blue</p>
-    </div>
-    <div class="photoFrame">
+    <div class="photoFrame" id="greenBlueFrame">
       <img id="monoGB" alt="" src="">
       <p>Green+Blue</p>
+    </div>
+    <div class="photoFrame" id="blueFrame">
+      <img id="monoB" alt="" src="">
+      <p>Blue</p>
     </div>
   </div>
   <div>
@@ -618,17 +641,36 @@ function setChannelMode(mode) {
     btn.style.boxShadow = "none";
   });
   
-  // Set active button
+  // Reset all channel previews (except Red which stays highlighted)
+  const monoG = document.querySelector('#greenFrame');
+  const monoB = document.querySelector('#blueFrame');
+  const monoGB = document.querySelector('#greenBlueFrame');
+  
+  [monoG, monoB, monoGB].forEach(frame => {
+    frame.style.border = "1px solid #30363d";
+    frame.style.boxShadow = "none";
+  });
+  
+  // Set active button and corresponding channel preview
   let activeBtn;
   if (mode === 'G') {
     activeBtn = btnG;
     btnG.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>G';
+    // Highlight Green channel preview
+    monoG.style.border = "2px solid #c9d1d9";
+    monoG.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
   } else if (mode === 'GB') {
     activeBtn = btnGB;
     btnGB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>C (G+B)';
+    // Highlight Green+Blue channel preview
+    monoGB.style.border = "2px solid #c9d1d9";
+    monoGB.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
   } else if (mode === 'B') {
     activeBtn = btnB;
     btnB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>B';
+    // Highlight Blue channel preview
+    monoB.style.border = "2px solid #c9d1d9";
+    monoB.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
   }
   
   if (activeBtn) {
@@ -645,6 +687,11 @@ function setChannelMode(mode) {
 document.getElementById("btnG").addEventListener("click", () => setChannelMode('G'));
 document.getElementById("btnGB").addEventListener("click", () => setChannelMode('GB'));
 document.getElementById("btnB").addEventListener("click", () => setChannelMode('B'));
+
+// Channel preview box event listeners (linked to the visibility buttons)
+document.getElementById("greenFrame").addEventListener("click", () => setChannelMode('G'));
+document.getElementById("greenBlueFrame").addEventListener("click", () => setChannelMode('GB'));
+document.getElementById("blueFrame").addEventListener("click", () => setChannelMode('B'));
 
 // Info button
 document.getElementById("btnInfo").addEventListener("click", function() {
@@ -832,6 +879,17 @@ const v = +document.getElementById('wbSlider').value;
 const M0 = 1000000 / 6500; // ≈154 μ
 const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
 document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + ' μ';
+
+// Make Red channel always highlighted and unclickable
+const redFrame = document.querySelector('#monoR').parentElement;
+redFrame.classList.add('red-channel-disabled');
+
+// Prevent clicks on red channel
+redFrame.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+});
 
 // Create and load generated patterns only
 document.getElementById('mosaic').src = createPattern();
