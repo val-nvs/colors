@@ -369,6 +369,24 @@ input[type="range"]:hover::-webkit-slider-thumb {
         <p>Color Circle</p>
       </div>
     </div>
+    <div class="splitView">
+      <div id="aBox" class="photoFrame">
+        <img id="aImg" alt="sample a" src="beach.jpg">
+        <p>Beach</p>
+      </div>
+      <div id="bBox" class="photoFrame">
+        <img id="bImg" alt="sample b" src="parrot.jpg">
+        <p>Parrot</p>
+      </div>
+      <div id="cBox" class="photoFrame">
+        <img id="cImg" alt="sample c" src="people.jpg">
+        <p>People</p>
+      </div>
+      <div id="dBox" class="photoFrame">
+        <img id="dImg" alt="sample d" src="rainbow.jpg">
+        <p>Rainbow</p>
+      </div>
+    </div>
   </div>
   <div>
     <p>Select the 2 channels:</p>
@@ -1124,6 +1142,30 @@ document.getElementById("colorBarsBox").addEventListener("click", () => {
 
 document.getElementById("circleBox").addEventListener("click", () => {
   currentImageSrc = document.getElementById("circleImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("aBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("aImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("bBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("bImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("cBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("cImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("dBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("dImg").src;
   clearImageCache();
   updateAllDisplays();
 });
