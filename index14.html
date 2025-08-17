@@ -311,6 +311,30 @@ input[type="range"]:hover::-webkit-slider-thumb {
   font-variation-settings: "BLED" 0, "SCAN" 0;
 }
 
+.editable-value {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+  user-select: none;
+}
+
+.editable-value:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.value-input {
+  background: #30363d;
+  border: 2px solid #58a6ff;
+  border-radius: 0.2em;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  padding: 0.1em 0.2em;
+  width: 3em;
+  outline: none;
+}
+
 /* KEYFRAMES for number animation */
 @keyframes morph {
   from { font-variation-settings: "BLED" 0, "SCAN" 0; }
@@ -419,13 +443,13 @@ input[type="range"]:hover::-webkit-slider-thumb {
   </div>
   <div class="header splitView">
     <div style="text-align: left;">
-      <p id="protoanHueVal">180°</p>
+      <p id="protoanHueVal" class="editable-value" title="Click to edit">180°</p>
     </div>
     <div style="text-align: center;">
-      <p id="longConeHueVal">0°</p>
+      <p id="longConeHueVal" class="editable-value" title="Click to edit">0°</p>
     </div>
     <div style="text-align: right;">
-      <p id="whiteBalanceVal">±0μ</p>
+      <p id="whiteBalanceVal" class="editable-value" title="Click to edit">±0μ</p>
     </div>
   </div>
   <div class="sliderGroup">
@@ -448,7 +472,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
     <button id="btnSave" class="button"><span class="material-symbols-outlined">download</span><br>Save</button>
   </div>
   <div class="sliderGroup">
-    <p class="groupLabel">Warm Channel Hue (keep near 0º for realistic skin tones)</p>
+    <p class="groupLabel">Warm Channel Hue (keep near 0 for realism)</p>
     <input id="longConeSlider" type="range" min="-180" value="0" max="179">
   </div>
   <div class="sliderGroup">
@@ -1201,6 +1225,106 @@ redFrame.addEventListener('click', (e) => {
   e.preventDefault();
   e.stopPropagation();
   return false;
+});
+
+// Editable header values functionality
+function makeValueEditable(elementId, currentValue, onSave) {
+  const element = document.getElementById(elementId);
+  const input = document.createElement('input');
+  input.className = 'value-input';
+  input.type = 'text';
+  input.value = currentValue;
+  
+  // Replace element with input
+  element.style.display = 'none';
+  element.parentNode.insertBefore(input, element.nextSibling);
+  input.focus();
+  input.select();
+  
+  function finishEditing() {
+    const newValue = input.value.trim();
+    input.remove();
+    element.style.display = '';
+    
+    if (newValue && newValue !== currentValue) {
+      onSave(newValue);
+    }
+  }
+  
+  input.addEventListener('blur', finishEditing);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') finishEditing();
+    if (e.key === 'Escape') {
+      input.remove();
+      element.style.display = '';
+    }
+  });
+}
+
+// Click handlers for editable values
+document.getElementById('protoanHueVal').addEventListener('click', () => {
+  const currentText = document.getElementById('protoanHueVal').textContent;
+  const currentValue = currentText.replace('°', '');
+  
+  makeValueEditable('protoanHueVal', currentValue, (newValue) => {
+    const targetHue = parseFloat(newValue);
+    if (!isNaN(targetHue) && targetHue >= 0 && targetHue <= 359) {
+      // Calculate what slider position would give us this hue
+      const currentL = +document.getElementById('longConeSlider').value;
+      const hueL = ((currentL % 360) + 360) % 360;
+      
+      // Solve for M: targetHue = (hueL + 120 + (M / 359) * 120) % 360
+      let targetDelta = targetHue - hueL - 120;
+      
+      // Handle wraparound
+      while (targetDelta < 0) targetDelta += 360;
+      while (targetDelta >= 360) targetDelta -= 360;
+      
+      const M = (targetDelta / 120) * 359;
+      const clampedM = Math.max(0, Math.min(359, M));
+      
+      document.getElementById('protoanSlider').value = clampedM;
+      computeOverlays();
+      updateSliderGradients();
+      updateAllDisplays();
+    }
+  });
+});
+
+document.getElementById('longConeHueVal').addEventListener('click', () => {
+  const currentText = document.getElementById('longConeHueVal').textContent;
+  const currentValue = currentText.replace('°', '');
+  
+  makeValueEditable('longConeHueVal', currentValue, (newValue) => {
+    const numValue = parseFloat(newValue);
+    if (!isNaN(numValue) && numValue >= -180 && numValue <= 179) {
+      // Set slider directly to the input value (no conversion needed)
+      document.getElementById('longConeSlider').value = numValue;
+      computeOverlays();
+      updateSliderGradients();
+      updateAllDisplays();
+    }
+  });
+});
+
+document.getElementById('whiteBalanceVal').addEventListener('click', () => {
+  const currentText = document.getElementById('whiteBalanceVal').textContent;
+  const currentValue = currentText.replace('μ', '').replace('±', '').replace('+', '');
+  
+  makeValueEditable('whiteBalanceVal', currentValue, (newValue) => {
+    const numValue = parseFloat(newValue);
+    if (!isNaN(numValue) && numValue >= -153 && numValue <= 153) {
+      // Convert micrired value back to slider value
+      const M0 = 1000000 / 6500; // ≈154 μ
+      const sliderValue = (numValue / (M0 * 0.99)) * 100;
+      document.getElementById('wbSlider').value = Math.round(sliderValue);
+      
+      if (!btnWB) {
+        setWB(true);
+      }
+      updateAllDisplays();
+    }
+  });
 });
 </script>
 </body>
