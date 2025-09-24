@@ -1,28 +1,1331 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Index Launcher</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800" rel="stylesheet">
+<!-- Long Cang for Chinese characters -->
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<!-- Launch full-screen from Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- Home-screen icon (iOS) -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Browser favicon -->
+<link rel="icon" href="favicon.png" sizes="any">
+<!-- Open Graph image -->
+<meta property="og:image" content="og_logo.jpg">
+<!-- 4. Theme-color (always black) -->
+<meta name="theme-color" content="#000000">
+
+<title>Color Filter</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sixtyfour:BLED,SCAN@0..100,-53..100&display=swap');
+
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+.pageBox, .history {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.splitView {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.sliderBox {
+  width: 100%;
+}
+
+/* Slider grouping styles */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  background: #30363d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  margin: 0.2rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sliderGroup .groupLabel {
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0 0 0.4rem 0;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.sliderGroup input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Channel grouping styles */
+.channelGroup {
+  display: flex;
+  flex-direction: column;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin: 0.2rem;
+}
+
+.groupLabel {
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.channelOptions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.channelOptions .photoFrame {
+  flex: 1;
+}
+
+/* Upload box styling */
+#uploadBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+  cursor: pointer;
+}
+
+#uploadBox:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+/* Channel preview boxes are clickable */
+#greenFrame, #greenBlueFrame, #blueFrame {
+  cursor: pointer;
+}
+
+#greenFrame:hover, #greenBlueFrame:hover, #blueFrame:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+/* History section wider frames */
+.history .photoFrame {
+  max-width: none;
+  width: 100%;
+}
+
+/* Red channel always highlighted and unclickable */
+.red-channel-disabled {
+  border: 2px solid #c9d1d9 !important;
+  box-shadow: 0 0 0.5rem rgba(201, 209, 217, 0.5) !important;
+  cursor: not-allowed !important;
+}
+
+.red-channel-disabled:hover {
+  background-color: #30363d !important;
+  border-color: #c9d1d9 !important;
+  cursor: not-allowed !important;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  flex: 1;
+}
+
+.photoFrame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #30363d;
+  border: 1px solid #30363d;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.photoFrame img {
+  border-radius: 0.2rem;
+}
+
+/* Cursor styling for sample images */
+.photoFrame {
+  cursor: pointer;
+}
+
+.photoFrame:hover {
+  background-color: #262c36;
+  border-color: #586069;
+}
+
+body {
+  background: #0D1117;
+  font-family: "Atkinson Hyperlegible Next", sans-serif;
+  font-size: 0.8rem;
+  color: #e6edf3;
+  max-width: 36rem;
+  margin: 0 auto;
+  transform: scale(1.5);
+  transform-origin: top center;
+}
+
+p {
+  margin: 0.3rem auto;
+}
+
+body img {
+  display: block;
+  width: 100%;
+}
+
+button {
+  -webkit-appearance: none;
+  font: inherit;
+  color: #e6edf3;
+  cursor: pointer;
+  line-height: inherit;
+  background-color: #30363d;
+  border: 1px solid #30363d;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.35rem;
+}
+
+button:hover {
+  background-color: #262c36;
+  border-color: #586069;
+  transform: translateY(0.1rem);
+}
+
+button:active {
+  background-color: #238636;
+  border-color: #238636;
+  transform: translateY(0);
+}
+
+button:focus {
+  outline: none;
+  background-color: #1f6feb;
+  border-color: #1f6feb;
+  transform: translateY(0.1rem);
+}
+
+#protoanSlider::-webkit-slider-runnable-track {
+  height: 0.2rem;
+}
+
+#longConeSlider::-webkit-slider-runnable-track {
+  height: 0.2rem;
+}
+
+#wbSlider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #03d, #fff, #f10);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background-size: 300% 100%;
+  height: 0.2rem;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2rem;
+  height: 1.5rem;
+  background: #fff;
+  border-radius: 10%;
+  cursor: pointer;
+  margin-top: -0.65rem;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0.5rem #fff;
+}
+
+/* text */
+.tiny {
+  font-size: 0.5rem;
+  word-spacing: 0.01rem;
+  line-height: 0.2;
+}
+
+.hanBig {
+  font-size: 1.5rem;
+  line-height: 1;
+  font-family: "Long Cang", cursive;
+}
+
+.hanHalf {
+  font-size: 0.75rem;
+  line-height: 1;
+  font-family: "Long Cang", cursive;
+}
+
+.header {
+  font-size: 2.5rem;
+  line-height: 0.59;
+  font-family: "Sixtyfour", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "BLED" 0, "SCAN" 0;
+}
+
+.editable-value {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+  user-select: none;
+}
+
+.editable-value:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.value-input {
+  background: #30363d;
+  border: 2px solid #58a6ff;
+  border-radius: 0.2em;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  padding: 0.1em 0.2em;
+  width: 3em;
+  outline: none;
+}
+
+/* KEYFRAMES for number animation */
+@keyframes morph {
+  from { font-variation-settings: "BLED" 0, "SCAN" 0; }
+  to   { font-variation-settings: "BLED" 50, "SCAN" 50; }
+}
+@keyframes morph0 {
+  from { font-variation-settings: "BLED" 50, "SCAN" 50; }
+  to   { font-variation-settings: "BLED" 0, "SCAN" 0; }
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 1.4rem;
+}
+
+#mainImgBox {
+  width: 100%;
+}
+
+.button {
+  line-height: 0.5rem;
+  font-size: 0.5rem;
+}
+
+/* Hidden canvas for processing */
+#processingCanvas {
+  display: none;
+}
+</style>
 </head>
 <body>
-  <ul>
-<li><a href="index1.html">Index 1 working demo* WORKS✅</a></li>
-<li><a href="index2.html">Index 2 newstyle</a></li>
-<li><a href="index3.html">Index 3 newstyle</a></li>
-<li><a href="index4.html">Index 4 diy html css</a></li>
-<li><a href="index5.html">Index 5 newstyle</a></li>
-<li><a href="index6.html">Index 6 ai refinediy</a></li>
-<li><a href="index7.html">Index 7 animated degrees BEST VERSION ⭐️ ⭐️ ⭐️</a></li>
-<li><a href="index8.html">Index 8 bad demo</a></li>
-<li><a href="index9.html">Index 9 ⭐️</a></li>
-<li><a href="index10.html">Index 10 LATEST VERSION⭐️</a></li>
-<li><a href="index11.html">Index 11</a></li>
-<li><a href="index12.html">Index 12</a></li>
-<li><a href="index13.html">Index 13</a></li>
-<li><a href="index14.html">Index 14</a></li>
-<li><a href="index15.html">Index 15</a></li>
 
+<div class="pageBox">
+  <div>
+    <p>Select image:</p>
+    <div class="splitView">
+      <div id="uploadBox" class="photoFrame">
+        <span class="material-symbols-outlined" style="font-size: 3rem; margin: 1rem;">upload</span>
+        <p>Upload</p>
+        <input type="file" id="fileInputSample" accept="image/*" style="display: none;">
+      </div>
+      <div id="colorCheckerBox" class="photoFrame">
+        <img id="colorCheckerImg" alt="color checker" src="checker.jpg">
+        <p>Color Checker</p>
+      </div>
+      <div id="colorBarsBox" class="photoFrame">
+        <img id="colorBarsImg" alt="color bars" src="color_bars.png">
+        <p>Bars</p>
+      </div>
+      <div id="circleBox" class="photoFrame">
+        <img id="circleImg" alt="color circle" src="circle.jpg">
+        <p>Color Circle</p>
+      </div>
+    </div>
+    <div class="splitView">
+      <div id="aBox" class="photoFrame">
+        <img id="aImg" alt="sample a" src="beach.jpg">
+        <p>Beach</p>
+      </div>
+      <div id="bBox" class="photoFrame">
+        <img id="bImg" alt="sample b" src="parrot.jpg">
+        <p>Parrot</p>
+      </div>
+      <div id="cBox" class="photoFrame">
+        <img id="cImg" alt="sample c" src="people.jpg">
+        <p>People</p>
+      </div>
+      <div id="dBox" class="photoFrame">
+        <img id="dImg" alt="sample d" src="rainbow.jpg">
+        <p>Rainbow</p>
+      </div>
+    </div>
+  </div>
+  <div>
+    <p>Select the 2 channels:</p>
+    <div class="splitView">
+      <div class="channelGroup">
+        <p class="groupLabel">Warm Channel</p>
+        <div class="photoFrame">
+          <img id="monoR" alt="" src="">
+          <p>Red</p>
+        </div>
+      </div>
+      <div class="channelGroup">
+        <p class="groupLabel">Cool Channel</p>
+        <div class="channelOptions">
+          <div class="photoFrame" id="greenFrame">
+            <img id="monoG" alt="" src="">
+            <p>Green</p>
+          </div>
+          <div class="photoFrame" id="greenBlueFrame">
+            <img id="monoGB" alt="" src="">
+            <p>Green+Blue</p>
+          </div>
+          <div class="photoFrame" id="blueFrame">
+            <img id="monoB" alt="" src="">
+            <p>Blue</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="header splitView">
+    <div style="text-align: left;">
+      <p id="protoanHueVal" class="editable-value" title="Click to edit">180°</p>
+    </div>
+    <div style="text-align: center;">
+      <p id="longConeHueVal" class="editable-value" title="Click to edit">0°</p>
+    </div>
+    <div style="text-align: right;">
+      <p id="whiteBalanceVal" class="editable-value" title="Click to edit">±0μ</p>
+    </div>
+  </div>
+  <div class="sliderGroup">
+    <p class="groupLabel">Cool Channel Hue</p>
+    <input id="protoanSlider" type="range" min="0" value="180" max="359">
+  </div>
+  <div id="mainImgBox">
+    <img id="mainImg" alt="Main Image" src="black.png">
+  </div>
+  <div id="buttonBox" class="splitView">
+    <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
+    <div id="buttonGroup">
+      <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
+      <button id="btnGB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>C (G+B)</button>
+      <button id="btnB" class="button"><span class="material-symbols-outlined">visibility_off</span><br>B</button>
+    </div>
+    <button id="btnInfo" class="button"><span class="material-symbols-outlined">pageview</span><br>Info</button>
+    <button id="btnSave" class="button"><span class="material-symbols-outlined">download</span><br>Save</button>
+  </div>
+  <div class="sliderGroup">
+    <p class="groupLabel">Warm Channel Hue (keep near 0 for realism)</p>
+    <input id="longConeSlider" type="range" min="-180" value="0" max="179">
+  </div>
+  <div class="sliderGroup">
+    <p class="groupLabel">White Balance</p>
+    <input id="wbSlider" type="range" min="-100" value="0" max="100">
+  </div>
+  <div class="splitView">
+    <div class="photoFrame">
+      <img id="originalImg" alt="" src="black.png">
+      <p>Original</p>
+    </div>
+    <div class="photoFrame">
+      <img id="afterWB" alt="" src="black.png">
+      <p>After White Balance</p>
+    </div>
+  </div>
+
+  <div class="history">
+    <p>Historical Technicolor Films:</p>
+    <div class="photoFrame">
+      <img alt="tollSea" loading="lazy" src="technicolor_tollsea_1922.jpg">
+      <p>The Toll of the Sea, 1922</p>
+      <p>Anna May Wong <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Anna_May_Wong_signature.svg" alt="signature" style="height: 5em; width: auto; display: inline; vertical-align: middle; filter: invert(1);"> and Kenneth Harlan</p>
+    </div>
+    <div class="photoFrame">
+      <img alt="phantom" loading="lazy" src="technicolor_phantom_1925.jpg">
+      <p>The Phantom of the Opera, 1925</p>
+      <p>Primarily black and white with select sequences filmed in two-strip Technicolor, including the masquerade ball where the Phantom's red death costume was dramatically revealed in color.</p>
+    </div>
+    <div class="photoFrame">
+      <img alt="bride" loading="lazy" src="technicolor_bride_1930.jpg">
+      <p>Bride of the Regiment, 1930</p>
+      <p>A musical operetta filmed entirely in two-strip Technicolor, starring Myrna Loy and Walter Pidgeon.</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #30363d; text-align: left; align-self: flex-start; width: 100%;">
+    <p><strong>See also</strong></p>
+    <ul style="list-style: none; padding-left: 0;">
+      <li><a href="https://en.wikipedia.org/wiki/List_of_color_film_systems" target="_blank" style="color: #58a6ff; text-decoration: none;">List of color film systems</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Technicolor#Two-color_Technicolor" target="_blank" style="color: #58a6ff; text-decoration: none;">Two-color Technicolor</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Kinemacolor" target="_blank" style="color: #58a6ff; text-decoration: none;">Kinemacolor</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Dichromacy" target="_blank" style="color: #58a6ff; text-decoration: none;">Dichromacy</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Hidden canvas for processing -->
+<canvas id="processingCanvas"></canvas>
+
+<script>
+// Global variables
+let currentImageSrc = null;
+let btnInfo = false;
+let btnWB = false;
+let channelMode = 'G'; // 'G', 'B', or 'GB'
+
+// Image processing cache
+let imageCache = {
+  currentSrc: null,
+  original: null,
+  channels: { R: null, G: null, B: null, GB: null },
+  afterWB: null,
+  lastWBValue: null,
+  lastWBButtonState: null,
+  lastInfoButtonState: null,
+  lastHueValues: null,
+  lastChannelMode: null
+};
+
+function clearImageCache() {
+  imageCache = {
+    currentSrc: null,
+    original: null,
+    channels: { R: null, G: null, B: null, GB: null },
+    afterWB: null,
+    lastWBValue: null,
+    lastWBButtonState: null,
+    lastInfoButtonState: null,
+    lastHueValues: null,
+    lastChannelMode: null
+  };
+}
+
+// Working filter functions from index12.html
+function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
+
+function kelvinToRgb(K) {
+  const t = K / 100;
+  let r, g, b;
+  if (t <= 66) {
+    r = 255;
+    g = 99.4708 * Math.log(t) - 161.1196;
+    b = t <= 19 ? 0 : 138.5177 * Math.log(t - 10) - 305.0448;
+  } else {
+    r = 329.6987 * Math.pow(t - 60, -0.1332);
+    g = 288.1222 * Math.pow(t - 60, -0.0755);
+    b = 255;
+  }
+  return { r: clamp(r), g: clamp(g), b: clamp(b) };
+}
+
+function hsv2rgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s;
+  const hp = h / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (hp < 1) [r1, g1, b1] = [c, x, 0];
+  else if (hp < 2) [r1, g1, b1] = [x, c, 0];
+  else if (hp < 3) [r1, g1, b1] = [0, c, x];
+  else if (hp < 4) [r1, g1, b1] = [0, x, c];
+  else if (hp < 5) [r1, g1, b1] = [x, 0, c];
+  else [r1, g1, b1] = [c, 0, x];
+  const m = v - c;
+  return { r: (r1 + m) * 255, g: (g1 + m) * 255, b: (b1 + m) * 255 };
+}
+
+function hueToHex(hue) {
+  const {r, g, b} = hsv2rgb(hue, 1, 1);
+  const toHex = (c) => Math.round(c).toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function updateHueColors() {
+  // Color the protoan hue value
+  const protoanHue = parseFloat(document.getElementById('protoanHueVal').textContent.replace('°', ''));
+  document.getElementById('protoanHueVal').style.color = hueToHex(protoanHue);
+  
+  // Color the long cone hue value (convert displayed negative values back to 0-360 range)
+  const longConeDisplayed = parseFloat(document.getElementById('longConeHueVal').textContent.replace('°', ''));
+  const longConeActual = longConeDisplayed < 0 ? longConeDisplayed + 360 : longConeDisplayed;
+  document.getElementById('longConeHueVal').style.color = hueToHex(longConeActual);
+}
+
+function normalize255(o) {
+  const s = o.r + o.g + o.b;
+  if (!s) return { r: 0, g: 0, b: 0 };
+  const f = 255 / s;
+  return { r: o.r * f, g: o.g * f, b: o.b * f };
+}
+
+function computeOverlays() {
+  const L = +document.getElementById('longConeSlider').value;
+  const M = +document.getElementById('protoanSlider').value;
+  const hueL = ((L % 360) + 360) % 360;
+  const delta = 120 + (M / 359) * 120;
+  const hueM = (hueL + delta) % 360;
+  
+  // Display hueL as negative when > 180 (so 359 becomes -1, 181 becomes -179, etc.)
+  const displayHueL = hueL > 180 ? hueL - 360 : hueL;
+  document.getElementById('longConeHueVal').textContent = displayHueL + '°';
+  
+  document.getElementById('protoanHueVal').textContent = hueM.toFixed(0) + '°';
+  
+  // Update colors for the hue values
+  updateHueColors();
+  
+  const oL = normalize255(hsv2rgb(hueL, 1, 1));
+  const oM = normalize255(hsv2rgb(hueM, 1, 1));
+  const rawS = {
+    r: Math.max(0, 255 - oL.r - oM.r),
+    g: Math.max(0, 255 - oL.g - oM.g),
+    b: Math.max(0, 255 - oL.b - oM.b)
+  };
+  
+  return { oL, oM, oS: normalize255(rawS) };
+}
+
+function updateSliderGradients() {
+  const L = +document.getElementById('longConeSlider').value;
+  const M = +document.getElementById('protoanSlider').value;
+  
+  // Convert hues to RGB for gradients
+  const hueToRgb = (h) => {
+    const {r, g, b} = hsv2rgb(h, 1, 0.8);
+    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+  };
+  
+  // Long cone slider: 6 colors across its range (-180 to 179)
+  // Positions: -180, -108, -36, 36, 108, 179
+  const longHues = [180, 252, 324, 36, 108, 179]; // normalized to 0-360
+  const longColors = longHues.map(h => hueToRgb(h));
+  document.getElementById('longConeSlider').style.background = 
+    `linear-gradient(to right, ${longColors.join(', ')})`;
+  
+  // Protoan slider: 6 colors showing resulting hueM values based on current hueL
+  const hueL = ((L % 360) + 360) % 360;
+  const protPositions = [0, 60, 120, 180, 240, 300]; // 6 evenly spaced positions in range 0-359
+  const protHues = protPositions.map(pos => {
+    const delta = 120 + (pos / 359) * 120;
+    return (hueL + delta) % 360;
+  });
+  const protColors = protHues.map(h => hueToRgb(h));
+  document.getElementById('protoanSlider').style.background = 
+    `linear-gradient(to right, ${protColors.join(', ')})`;
+}
+
+// Canvas processing functions
+function processImage(imgSrc, targetImgId, processFunc) {
+  if (!imgSrc) return;
+  
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function() {
+    const canvas = document.getElementById('processingCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
     
-  </ul>
+    if (processFunc) {
+      processFunc(ctx, canvas);
+    }
+    
+    // Convert to data URL and set to target img
+    const dataUrl = canvas.toDataURL();
+    document.getElementById(targetImgId).src = dataUrl;
+  };
+  img.src = imgSrc;
+}
+
+// Processing functions - using working versions from index12.html
+function applyWhiteBalance(ctx, canvas) {
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500; // ≈154 μ
+  const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+  const Mt = M0 + deltaM;
+  const K = 1000000 / Mt;
+  
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
+  
+  const rgb = kelvinToRgb(K);
+  const gR = rgb.r / 255, gG = rgb.g / 255, gB = rgb.b / 255;
+  
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = clamp(d[i] * gR);
+    d[i + 1] = clamp(d[i + 1] * gG);
+    d[i + 2] = clamp(d[i + 2] * gB);
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function applyHueOverlays(ctx, canvas) {
+  const { oL, oM, oS } = computeOverlays();
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+  
+  for (let i = 0; i < d.length; i += 4) {
+    const L = d[i]; // Always RED channel
+    let M, S;
+    
+    // Switch protoan input based on channel mode
+    if (channelMode === 'G') {
+      M = d[i + 1]; // GREEN channel
+      S = (L + M) / 2; // (RED + GREEN) / 2
+    } else if (channelMode === 'B') {
+      M = d[i + 2]; // BLUE channel
+      S = (L + M) / 2; // (RED + BLUE) / 2
+    } else if (channelMode === 'GB') {
+      M = (d[i + 1] + d[i + 2]) / 2; // (GREEN + BLUE) / 2
+      S = (L + M) / 2; // (RED + (GREEN+BLUE)/2) / 2
+    }
+    
+    const tint = (v, o) => ({ r: o.r * (v / 255), g: o.g * (v / 255), b: o.b * (v / 255) });
+    const tL = tint(L, oL), tM = tint(M, oM), tS = tint(S, oS);
+    let r = tL.r + tM.r + tS.r, g = tL.g + tM.g + tS.g, b = tL.b + tM.b + tS.b;
+    d[i] = r > 255 ? 255 : r;
+    d[i + 1] = g > 255 ? 255 : g;
+    d[i + 2] = b > 255 ? 255 : b;
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function extractColorChannel(ctx, canvas, channel) {
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    
+    switch (channel) {
+      case 'red':
+        data[i] = r;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
+        break;
+      case 'green':
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = 0;
+        break;
+      case 'blue':
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = b;
+        break;
+      case 'green-blue':
+        data[i] = 0;
+        data[i + 1] = g;
+        data[i + 2] = b;
+        break;
+    }
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+// Update all displays
+function updateAllDisplays() {
+  if (!currentImageSrc) return;
+  
+  // Clear cache if image source changed
+  if (imageCache.currentSrc !== currentImageSrc) {
+    clearImageCache();
+    imageCache.currentSrc = currentImageSrc;
+  }
+  
+  // Process original image (cache once per image load)
+  if (!imageCache.original) {
+    processImage(currentImageSrc, 'originalImg');
+    // Use setTimeout to ensure canvas processing completes before caching
+    setTimeout(() => {
+      imageCache.original = document.getElementById('originalImg').src;
+    }, 100);
+  } else {
+    // Always use cached original - never affected by button states
+    document.getElementById('originalImg').src = imageCache.original;
+  }
+  
+  // Process color channels (cache once per image)
+  if (!imageCache.channels.R) {
+    processImage(currentImageSrc, 'monoR', (ctx, canvas) => extractColorChannel(ctx, canvas, 'red'));
+    processImage(currentImageSrc, 'monoG', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green'));
+    processImage(currentImageSrc, 'monoB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'blue'));
+    processImage(currentImageSrc, 'monoGB', (ctx, canvas) => extractColorChannel(ctx, canvas, 'green-blue'));
+    
+    // Cache the results
+    setTimeout(() => {
+      imageCache.channels.R = document.getElementById('monoR').src;
+      imageCache.channels.G = document.getElementById('monoG').src;
+      imageCache.channels.B = document.getElementById('monoB').src;
+      imageCache.channels.GB = document.getElementById('monoGB').src;
+    }, 100);
+  } else {
+    document.getElementById('monoR').src = imageCache.channels.R;
+    document.getElementById('monoG').src = imageCache.channels.G;
+    document.getElementById('monoB').src = imageCache.channels.B;
+    document.getElementById('monoGB').src = imageCache.channels.GB;
+  }
+  
+  // Get current values and check what changed
+  const currentWBValue = +document.getElementById('wbSlider').value;
+  const currentHueValues = [
+    +document.getElementById('longConeSlider').value,
+    +document.getElementById('protoanSlider').value
+  ];
+  
+  const wbChanged = currentWBValue !== imageCache.lastWBValue;
+  const wbButtonChanged = btnWB !== imageCache.lastWBButtonState;
+  const infoButtonChanged = btnInfo !== imageCache.lastInfoButtonState;
+  const hueChanged = !imageCache.lastHueValues || 
+    currentHueValues[0] !== imageCache.lastHueValues[0] || 
+    currentHueValues[1] !== imageCache.lastHueValues[1];
+  const channelChanged = channelMode !== imageCache.lastChannelMode;
+  
+  // Process white balance preview (only when WB value changes)
+  if (wbChanged) {
+    processImage(currentImageSrc, 'afterWB', applyWhiteBalance);
+    setTimeout(() => {
+      imageCache.afterWB = document.getElementById('afterWB').src;
+    }, 100);
+  } else if (imageCache.afterWB) {
+    document.getElementById('afterWB').src = imageCache.afterWB;
+  }
+  
+  // Process main image (when hue values, channel mode, WB value, WB button, or Info button changes)
+  if (hueChanged || channelChanged || wbChanged || wbButtonChanged || infoButtonChanged) {
+    processImage(currentImageSrc, 'mainImg', (ctx, canvas) => {
+      // Only apply white balance if WB button is ON
+      if (btnWB) {
+        applyWhiteBalance(ctx, canvas);
+      }
+      applyHueOverlays(ctx, canvas);
+      
+      // Add filename overlay if Info button is ON
+      if (btnInfo) {
+        const mode = channelMode === 'GB' ? 'C' : channelMode;
+        const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
+        const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
+        const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace('μ', '');
+        
+        const longConeValue = parseInt(longConeRaw);
+        const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
+        const wbValue = parseInt(wbCleaned.replace('-', ''));
+        const includeWB = btnWB && wbValue !== 0;
+        
+        let filename = `dichromatic_${mode}${protoanDisplayed}`;
+        if (longConeValue !== 0 || includeWB) {
+          filename += `_R${longConeRaw}`;
+        }
+        if (includeWB) {
+          filename += `_U${wbCleaned}`;
+        }
+        
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.font = "16px monospace";
+        ctx.strokeText(filename, 10, 25);
+        ctx.fillText(filename, 10, 25);
+      }
+    });
+    
+    imageCache.lastHueValues = currentHueValues;
+    imageCache.lastChannelMode = channelMode;
+  }
+  
+  // Update cache values after all processing
+  imageCache.lastWBValue = currentWBValue;
+  imageCache.lastWBButtonState = btnWB;
+  imageCache.lastInfoButtonState = btnInfo;
+}
+
+// Channel button functions
+function setChannelMode(mode) {
+  channelMode = mode;
+  
+  // Update button states
+  const btnG = document.getElementById("btnG");
+  const btnGB = document.getElementById("btnGB");
+  const btnB = document.getElementById("btnB");
+  
+  // Reset all buttons to off state
+  btnG.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>G';
+  btnGB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>C (G+B)';
+  btnB.innerHTML = '<span class="material-symbols-outlined">visibility_off</span><br>B';
+  
+  [btnG, btnGB, btnB].forEach(btn => {
+    btn.style.backgroundColor = "#30363d";
+    btn.style.borderColor = "#30363d";
+    btn.style.color = "#e6edf3";
+    btn.style.boxShadow = "none";
+  });
+  
+  // Reset all channel previews (except Red which stays highlighted)
+  const monoG = document.querySelector('#greenFrame');
+  const monoB = document.querySelector('#blueFrame');
+  const monoGB = document.querySelector('#greenBlueFrame');
+  
+  [monoG, monoB, monoGB].forEach(frame => {
+    frame.style.border = "1px solid #30363d";
+    frame.style.boxShadow = "none";
+  });
+  
+  // Set active button and corresponding channel preview
+  let activeBtn;
+  if (mode === 'G') {
+    activeBtn = btnG;
+    btnG.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>G';
+    // Highlight Green channel preview
+    monoG.style.border = "2px solid #c9d1d9";
+    monoG.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
+  } else if (mode === 'GB') {
+    activeBtn = btnGB;
+    btnGB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>C (G+B)';
+    // Highlight Green+Blue channel preview
+    monoGB.style.border = "2px solid #c9d1d9";
+    monoGB.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
+  } else if (mode === 'B') {
+    activeBtn = btnB;
+    btnB.innerHTML = '<span class="material-symbols-outlined">visibility</span><br>B';
+    // Highlight Blue channel preview
+    monoB.style.border = "2px solid #c9d1d9";
+    monoB.style.boxShadow = "0 0 0.5rem rgba(201, 209, 217, 0.5)";
+  }
+  
+  if (activeBtn) {
+    activeBtn.style.backgroundColor = "#c9d1d9";
+    activeBtn.style.borderColor = "#c9d1d9";
+    activeBtn.style.color = "#0D1117";
+    activeBtn.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
+  }
+  
+  updateAllDisplays();
+}
+
+// Channel button event listeners
+document.getElementById("btnG").addEventListener("click", () => setChannelMode('G'));
+document.getElementById("btnGB").addEventListener("click", () => setChannelMode('GB'));
+document.getElementById("btnB").addEventListener("click", () => setChannelMode('B'));
+
+// Channel preview box event listeners (linked to the visibility buttons)
+document.getElementById("greenFrame").addEventListener("click", () => setChannelMode('G'));
+document.getElementById("greenBlueFrame").addEventListener("click", () => setChannelMode('GB'));
+document.getElementById("blueFrame").addEventListener("click", () => setChannelMode('B'));
+
+// Info button
+document.getElementById("btnInfo").addEventListener("click", function() {
+  btnInfo = !btnInfo;
+  if (btnInfo) {
+    this.style.backgroundColor = "#c9d1d9";
+    this.style.borderColor = "#c9d1d9";
+    this.style.color = "#0D1117";
+    this.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
+  } else {
+    this.style.backgroundColor = "#30363d";
+    this.style.borderColor = "#30363d";
+    this.style.color = "#e6edf3";
+    this.style.boxShadow = "none";
+  }
+  updateAllDisplays(); // Refresh image to show/hide overlay
+});
+
+// WB button and slider
+const wbButton = document.getElementById("btnWB");
+const wbSlider = document.getElementById("wbSlider");
+
+function setWB(on) {
+  btnWB = on;
+  if (btnWB) {
+    wbButton.style.backgroundColor = "#c9d1d9";
+    wbButton.style.borderColor = "#c9d1d9";
+    wbButton.style.color = "#0D1117";
+    wbButton.style.boxShadow = "0 0 0.3rem rgba(201, 209, 217, 0.5)";
+  } else {
+    wbButton.style.backgroundColor = "#30363d";
+    wbButton.style.borderColor = "#30363d";
+    wbButton.style.color = "#e6edf3";
+    wbButton.style.boxShadow = "none";
+  }
+  updateAllDisplays();
+}
+
+wbButton.addEventListener("click", () => {
+  setWB(!btnWB);
+});
+
+wbSlider.addEventListener("input", () => {
+  // Update the white balance value display immediately
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500; // ≈154 μ
+  const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
+  
+  if (!btnWB) {
+    setWB(true);
+  }
+  updateAllDisplays();
+});
+
+// White balance slider animations
+wbSlider.addEventListener("mousedown", () => startScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("touchstart", () => startScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("mouseup", () => endScanAnimation('whiteBalanceVal'));
+wbSlider.addEventListener("touchend", () => endScanAnimation('whiteBalanceVal'));
+
+// Upload buttons
+const uploadBtn = document.getElementById("btnUpload");
+const fileInput = document.getElementById("fileInput");
+const uploadBox = document.getElementById("uploadBox");
+const fileInputSample = document.getElementById("fileInputSample");
+const mainImg = document.getElementById("mainImg");
+
+uploadBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+
+uploadBox.addEventListener("click", () => {
+  fileInputSample.click();
+});
+
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  currentImageSrc = URL.createObjectURL(file);
+  clearImageCache();
+  updateAllDisplays();
+});
+
+fileInputSample.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  currentImageSrc = URL.createObjectURL(file);
+  clearImageCache();
+  updateAllDisplays();
+});
+
+// Save button
+document.getElementById("btnSave").addEventListener("click", () => {
+  const mainImg = document.getElementById("mainImg");
+  if (mainImg.src) {
+    // Get displayed values from top of page
+    const mode = channelMode === 'GB' ? 'C' : channelMode;
+    const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
+    const protoanDisplayed = document.getElementById("protoanHueVal").textContent.replace('°', '');
+    const wbRaw = document.getElementById("whiteBalanceVal").textContent.replace('μ', '');
+    
+    // Parse values
+    const longConeValue = parseInt(longConeRaw);
+    const wbCleaned = wbRaw === '±0' ? '0' : wbRaw.replace('±', '').replace('+', '');
+    const wbValue = parseInt(wbCleaned.replace('-', ''));
+    
+    // Check if WB is active and not zero
+    const includeWB = btnWB && wbValue !== 0;
+    
+    // Build filename conditionally
+    let filename = `dichromatic_${mode}${protoanDisplayed}`;
+    
+    // Add R if not zero OR if U will be included
+    if (longConeValue !== 0 || includeWB) {
+      filename += `_R${longConeRaw}`;
+    }
+    
+    // Add U only if WB button is active and value is not zero
+    if (includeWB) {
+      filename += `_U${wbCleaned}`;
+    }
+    
+    filename += '.png';
+    
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = mainImg.src;
+    link.click();
+  }
+});
+
+// Slider updates
+const longConeSlider = document.getElementById("longConeSlider");
+const protoanSlider = document.getElementById("protoanSlider");
+
+longConeSlider.addEventListener("input", () => {
+  updateSliderGradients();
+  updateAllDisplays();
+});
+
+protoanSlider.addEventListener("input", () => {
+  updateSliderGradients();
+  updateAllDisplays();
+});
+
+// Animation based on mouse/touch interaction
+longConeSlider.addEventListener("mousedown", () => startScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("touchstart", () => startScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("mouseup", () => endScanAnimation('longConeHueVal'));
+longConeSlider.addEventListener("touchend", () => endScanAnimation('longConeHueVal'));
+
+protoanSlider.addEventListener("mousedown", () => startScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("touchstart", () => startScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("mouseup", () => endScanAnimation('protoanHueVal'));
+protoanSlider.addEventListener("touchend", () => endScanAnimation('protoanHueVal'));
+
+// Animation functions for big numbers
+function startScanAnimation(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.style.animation = 'none';
+    void el.offsetWidth; // Force reflow
+    el.style.animation = 'morph 0.3s cubic-bezier(0.9,0,0.1,1) forwards';
+  }
+}
+
+function endScanAnimation(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.style.animation = 'morph0 0.5s cubic-bezier(0.9,0,0.1,1) forwards';
+  }
+}
+
+// Sample image clicks
+document.getElementById("colorCheckerBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("colorCheckerImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("colorBarsBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("colorBarsImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("circleBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("circleImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("aBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("aImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("bBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("bImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("cBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("cImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+document.getElementById("dBox").addEventListener("click", () => {
+  currentImageSrc = document.getElementById("dImg").src;
+  clearImageCache();
+  updateAllDisplays();
+});
+
+// Initialize display values
+document.getElementById("whiteBalanceVal").textContent = "±0μ";
+computeOverlays();
+updateSliderGradients();
+
+// Initialize channel mode
+setChannelMode('G');
+
+// Set black.png placeholders for all image previews (after initialization)
+document.getElementById('monoR').src = 'black.png';
+document.getElementById('monoG').src = 'black.png';
+document.getElementById('monoB').src = 'black.png';
+document.getElementById('monoGB').src = 'black.png';
+document.getElementById('originalImg').src = 'black.png';
+document.getElementById('afterWB').src = 'black.png';
+
+// Initialize white balance display
+const v = +document.getElementById('wbSlider').value;
+const M0 = 1000000 / 6500; // ≈154 μ
+const deltaM = v / 100 * M0 * 0.99; // ±99% of baseline
+document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
+
+// Make Red channel always highlighted and unclickable
+const redFrame = document.querySelector('#monoR').parentElement;
+redFrame.classList.add('red-channel-disabled');
+
+// Prevent clicks on red channel
+redFrame.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+});
+
+// Editable header values functionality
+function makeValueEditable(elementId, currentValue, onSave) {
+  const element = document.getElementById(elementId);
+  const input = document.createElement('input');
+  input.className = 'value-input';
+  input.type = 'text';
+  input.value = currentValue;
+  
+  // Replace element with input
+  element.style.display = 'none';
+  element.parentNode.insertBefore(input, element.nextSibling);
+  input.focus();
+  input.select();
+  
+  function finishEditing() {
+    const newValue = input.value.trim();
+    input.remove();
+    element.style.display = '';
+    
+    if (newValue && newValue !== currentValue) {
+      onSave(newValue);
+    }
+  }
+  
+  input.addEventListener('blur', finishEditing);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') finishEditing();
+    if (e.key === 'Escape') {
+      input.remove();
+      element.style.display = '';
+    }
+  });
+}
+
+// Click handlers for editable values
+document.getElementById('protoanHueVal').addEventListener('click', () => {
+  const currentText = document.getElementById('protoanHueVal').textContent;
+  const currentValue = currentText.replace('°', '');
+  
+  makeValueEditable('protoanHueVal', currentValue, (newValue) => {
+    const targetHue = parseFloat(newValue);
+    if (!isNaN(targetHue) && targetHue >= 0 && targetHue <= 359) {
+      // Calculate what slider position would give us this hue
+      const currentL = +document.getElementById('longConeSlider').value;
+      const hueL = ((currentL % 360) + 360) % 360;
+      
+      // Solve for M: targetHue = (hueL + 120 + (M / 359) * 120) % 360
+      let targetDelta = targetHue - hueL - 120;
+      
+      // Handle wraparound
+      while (targetDelta < 0) targetDelta += 360;
+      while (targetDelta >= 360) targetDelta -= 360;
+      
+      const M = (targetDelta / 120) * 359;
+      const clampedM = Math.max(0, Math.min(359, M));
+      
+      document.getElementById('protoanSlider').value = clampedM;
+      computeOverlays();
+      updateSliderGradients();
+      updateAllDisplays();
+    }
+  });
+});
+
+document.getElementById('longConeHueVal').addEventListener('click', () => {
+  const currentText = document.getElementById('longConeHueVal').textContent;
+  const currentValue = currentText.replace('°', '');
+  
+  makeValueEditable('longConeHueVal', currentValue, (newValue) => {
+    const numValue = parseFloat(newValue);
+    if (!isNaN(numValue) && numValue >= -180 && numValue <= 179) {
+      // Set slider directly to the input value (no conversion needed)
+      document.getElementById('longConeSlider').value = numValue;
+      computeOverlays();
+      updateSliderGradients();
+      updateAllDisplays();
+    }
+  });
+});
+
+document.getElementById('whiteBalanceVal').addEventListener('click', () => {
+  const currentText = document.getElementById('whiteBalanceVal').textContent;
+  const currentValue = currentText.replace('μ', '').replace('±', '').replace('+', '');
+  
+  makeValueEditable('whiteBalanceVal', currentValue, (newValue) => {
+    const numValue = parseFloat(newValue);
+    if (!isNaN(numValue) && numValue >= -153 && numValue <= 153) {
+      // Convert micrired value back to slider value
+      const M0 = 1000000 / 6500; // ≈154 μ
+      const sliderValue = (numValue / (M0 * 0.99)) * 100;
+      document.getElementById('wbSlider').value = Math.round(sliderValue);
+      
+      if (!btnWB) {
+        setWB(true);
+      }
+      updateAllDisplays();
+    }
+  });
+});
+</script>
 </body>
 </html>
