@@ -1,0 +1,188 @@
+<!--
+Dark-mode, mobile-first responsive HTML page with skeleton rectangles and image upload support, now with top-left upload button and right trash button.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dark Mode Bezier Layout - Image Upload with Buttons</title>
+  <style>
+    :root{
+      --bg: #0b0f13;
+      --panel: #0f1720;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+    }
+
+    body{margin:0;padding:24px;font-family:Inter, sans-serif;background:linear-gradient(180deg,var(--bg),#061018 120%);color:var(--muted);display:flex;justify-content:center}
+    .container{max-width:1100px;width:100%}
+    .card{background:linear-gradient(180deg,var(--panel),#0b1220);border-radius:12px;padding:18px;}
+
+    .top-wrap{display:flex;justify-content:center;margin:40px 0} 
+    .rect, .node{width:260px;aspect-ratio:3/2;border-radius:12px;background:#1e293b;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+    .rect img, .node img{width:100%;height:100%;object-fit:cover;}
+
+    .upload-btn, .trash-btn{
+      position:absolute;
+      width:24px;
+      height:24px;
+      border:none;
+      border-radius:4px;
+      background:rgba(96,165,250,0.85);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      font-size:14px;
+      z-index:2;
+    }
+    .upload-btn{top:4px;left:4px;}
+    .trash-btn{top:4px;right:4px;background:rgba(248,113,113,0.85);}
+
+    .three-row{position:relative;margin:50px 0}
+    .row{display:flex;gap:14px;justify-content:space-between}
+    .bottom-row{margin-top:36px}
+
+    .three-row svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+    input[type='file']{display:none;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>
+        <h1 style="color:var(--accent);font-size:16px;margin:0">Image Upload Layout</h1>
+      </header>
+
+      <section class="top-wrap">
+        <div id="rootRect" class="rect">
+          <button class="upload-btn">+</button>
+          <button class="trash-btn">🗑</button>
+          <input type="file" accept="image/*">
+        </div>
+      </section>
+
+      <section class="three-row" id="middleSection">
+        <svg id="linksSvg" aria-hidden="true"></svg>
+        <div class="row" id="topRow">
+          <div class="node" id="top1"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+          <div class="node" id="top2"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+          <div class="node" id="top3"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+        </div>
+        <div class="row bottom-row" id="bottomRow">
+          <div class="node" id="bot1"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+          <div class="node" id="bot2"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+          <div class="node" id="bot3"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><input type="file" accept="image/*"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const svg = document.getElementById('linksSvg');
+      const root = document.getElementById('rootRect');
+      const topNodes = [document.getElementById('top1'), document.getElementById('top2'), document.getElementById('top3')];
+      const botNodes = [document.getElementById('bot1'), document.getElementById('bot2'), document.getElementById('bot3')];
+
+      function centerPoint(el){
+        const rect = el.getBoundingClientRect();
+        const parentRect = svg.getBoundingClientRect();
+        return {x: rect.left + rect.width/2 - parentRect.left, y: rect.top + rect.height/2 - parentRect.top};
+      }
+
+      function makePath(d){
+        const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d',d);
+        p.setAttribute('fill','none');
+        p.setAttribute('stroke','rgba(96,165,250,0.85)');
+        p.setAttribute('stroke-width','8');
+        p.setAttribute('stroke-linecap','round');
+        p.setAttribute('stroke-linejoin','round');
+        return p;
+      }
+
+      function draw(){
+        while(svg.firstChild) svg.removeChild(svg.firstChild);
+        const container = document.getElementById('middleSection');
+        const box = container.getBoundingClientRect();
+        svg.setAttribute('width', box.width);
+        svg.setAttribute('height', box.height);
+        svg.style.width = box.width + 'px';
+        svg.style.height = box.height + 'px';
+
+        const rootRect = root.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+        const rootX = (rootRect.left + rootRect.width/2) - svgRect.left;
+        const rootY = (rootRect.top + rootRect.height) - svgRect.top;
+
+        topNodes.forEach((n)=>{
+          const c = centerPoint(n);
+          const startX = rootX;
+          const startY = rootY;
+          const endX = c.x;
+          const endY = c.y - (n.getBoundingClientRect().height/2);
+          const cp1x = startX;
+          const cp1y = startY + Math.max(60, box.height * 0.14);
+          const cp2x = endX;
+          const cp2y = endY - Math.max(60, box.height * 0.14);
+          const d = `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+          svg.appendChild(makePath(d));
+        });
+
+        for(let i=0;i<topNodes.length;i++){
+          const topC = centerPoint(topNodes[i]);
+          const botC = centerPoint(botNodes[i]);
+          const startX = topC.x;
+          const startY = topNodes[i].getBoundingClientRect().bottom - svgRect.top;
+          const endX = botC.x;
+          const endY = botNodes[i].getBoundingClientRect().top - svgRect.top;
+          const offset = Math.max(10, (endY - startY) * 0.18);
+          const cp1x = startX;
+          const cp1y = startY + offset;
+          const cp2x = endX;
+          const cp2y = endY - offset;
+          const d = `M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+          svg.appendChild(makePath(d));
+        }
+      }
+
+      window.addEventListener('load', draw);
+      window.addEventListener('resize',()=>{if(window._drawRaf) cancelAnimationFrame(window._drawRaf); window._drawRaf = requestAnimationFrame(draw);});
+      setTimeout(draw,400);
+
+      // Handle image uploads with buttons
+      const allRects = [root,...topNodes,...botNodes];
+      allRects.forEach(rect=>{
+        const input = rect.querySelector('input[type=file]');
+        const uploadBtn = rect.querySelector('.upload-btn');
+        const trashBtn = rect.querySelector('.trash-btn');
+
+        uploadBtn.addEventListener('click', e=>{e.stopPropagation(); input.click();});
+        input.addEventListener('change', e => {
+          const file = e.target.files[0];
+          if(file){
+            const url = URL.createObjectURL(file);
+            rect.querySelector('img')?.remove();
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'uploaded image';
+            rect.appendChild(img);
+          }
+        });
+
+        trashBtn.addEventListener('click', e=>{
+          e.stopPropagation();
+          const img = rect.querySelector('img');
+          if(img) img.remove();
+          input.value = '';
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>
