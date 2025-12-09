@@ -198,6 +198,7 @@ input[type='file']{display:none}
 (function(){
 const svg=document.getElementById('linksSvg');
 const middleSection = document.getElementById('middleSection');
+const rootRect = document.getElementById('rootRect');
 const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
 const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
 const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];
@@ -278,11 +279,15 @@ function updateFlowButtonState(targetId) {
     }
     
     // Button is ACTIVE (yellow) if source is ready AND target is empty
+    // Button is INACTIVE (gray) otherwise
     if (sourceReady && targetEmpty) {
         button.classList.remove('inactive');
     } else {
-        // Button is INACTIVE (gray) otherwise
         button.classList.add('inactive');
+        // If processing failed before and the error icon '❌' is shown, replace it with the default '⬇️'
+        if (button.innerHTML === '❌' || button.innerHTML === '⚙️') {
+             button.innerHTML = '⬇️';
+        }
     }
 }
 
@@ -347,6 +352,45 @@ function draw(){
     }
 }
 
+// Helper to clear a single node and update its flow state
+function clearNode(nodeEl) {
+    const rectId = nodeEl.id;
+    const imgEl = nodeEl.querySelector('img');
+    const input = nodeEl.querySelector('input[type=file]');
+
+    imgEl.src = '';
+    if (input) input.value = ''; // Only clear input if it exists
+    
+    nodeEl.classList.add('empty');
+    nodeEl.classList.remove('uploaded');
+    
+    delete nodeCanvases[rectId];
+    delete originalFiles[rectId];
+
+    // Update flow button leading to this node
+    updateFlowButtonState(rectId);
+}
+
+// Helper to update downstream flow button states
+function updateDownstreamFlows(rectId) {
+    if(rectId === 'rootRect'){
+        // If root is modified/cleared, disable all top-row processing buttons
+        // but do *not* clear the images themselves.
+        topNodes.forEach(n => {
+            updateFlowButtonState(n.id); 
+            // Also update the buttons for the bottom row, as the ultimate source is now missing
+            const topIdx = topNodes.indexOf(n);
+            updateFlowButtonState(botNodes[topIdx].id);
+        });
+    } else {
+        const topIdx = topNodes.findIndex(n => n.id === rectId);
+        if (topIdx !== -1 && botNodes[topIdx]) {
+            // Only update state for the downstream bot node
+            updateFlowButtonState(botNodes[topIdx].id);
+        }
+    }
+}
+
 async function handleUpdateClick(e) {
     e.stopPropagation();
     const button = e.currentTarget;
@@ -376,11 +420,12 @@ async function handleUpdateClick(e) {
     
     if(!sourceCanvas) return; // Should not happen due to inactive state check
 
-    // Visual indication of work (optional, but good for UX)
+    // Visual indication of work
     button.innerHTML = '⚙️'; 
     button.classList.add('inactive'); // Temporarily set inactive during processing
     
     const imgEl = rect.querySelector('img');
+    let success = false;
     
     // Start processing (using low-res canvas)
     try {
@@ -404,39 +449,42 @@ async function handleUpdateClick(e) {
                 newData.data[i+3]=255; 
             }
         } else {
-            // Process Grayscale
+            // Process Grayscale (R=0, G=1, B=2) - Correctly use intensity of the specified channel only.
+            const componentIndex = channelIdx; 
              for(let j=0;j<imgData.data.length;j+=4){
-                const avg = (imgData.data[j]+imgData.data[j+1]+imgData.data[j+2])/3;
-                newData.data[j] = avg;
-                newData.data[j+1] = avg;
-                newData.data[j+2] = avg;
-                newData.data[j+3] = 255;
+                // Use the intensity of the specific channel in the source image
+                const intensity = imgData.data[j + componentIndex]; 
+                
+                newData.data[j] = intensity;   // New Red = Intensity
+                newData.data[j+1] = intensity; // New Green = Intensity
+                newData.data[j+2] = intensity; // New Blue = Intensity
+                newData.data[j+3] = 255;       // Alpha
             }
         }
 
         nctx.putImageData(newData,0,0);
         
-        // Update the display element and state
-        imgEl.src=newCanvas.toDataURL();
+        // Use synchronous assignment
+        imgEl.src = newCanvas.toDataURL();
+
+        // Update the display element and state immediately.
         nodeCanvases[rect.id] = newCanvas;
         rect.classList.remove('empty'); 
         
-        // Reset button and update states downstream
-        button.innerHTML = '⬇️';
-        button.classList.add('inactive'); // The target is no longer empty, so button becomes inactive
-
-        if (isTopRow) {
-            // Processing a top node makes the corresponding bottom node ready
-            if (botNodes[channelIdx]) {
-                updateFlowButtonState(botNodes[channelIdx].id);
-            }
-        }
+        success = true;
 
     } catch (error) {
         console.error("Image processing failed:", error);
-        button.innerHTML = '❌'; 
-        // Re-enable button if process failed
-        updateFlowButtonState(targetId); 
+        button.innerHTML = '❌'; // Show failure icon
+    } finally {
+        // Guarantee button reset and state update
+        if (success) {
+            button.innerHTML = '⬇️';
+        }
+        
+        // Update state of the current flow button (targetId) and downstream nodes
+        updateFlowButtonState(targetId);
+        updateDownstreamFlows(targetId);
     }
 }
 
@@ -469,11 +517,20 @@ function processHighResAndSave(file, type, channelIdx) {
 
             // 2. Apply Grayscale Filter (if applicable)
             if (type === 'grayscale' || type === 'both') {
+                const componentIndex = (type === 'both') ? channelIdx : null;
                 for(let i=0; i<data.length; i+=4) {
-                    const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-                    data[i] = avg;
-                    data[i+1] = avg;
-                    data[i+2] = avg;
+                    let intensity;
+                    if (componentIndex !== null) {
+                        // Channel Grayscale (e.g., Red Grayscale) - Uses only the specified channel intensity
+                        intensity = data[i + componentIndex]; 
+                    } else {
+                        // Standard Grayscale (if processing a non-channel specific manual upload) - Uses average
+                        intensity = (data[i] + data[i+1] + data[i+2]) / 3;
+                    }
+                    
+                    data[i] = intensity;
+                    data[i+1] = intensity;
+                    data[i+2] = intensity;
                     data[i+3] = 255;
                 }
             }
@@ -502,6 +559,7 @@ allNodes.forEach(rect=>{
     const trashBtn=rect.querySelector('.trash-btn');
     const saveBtn=rect.querySelector('.save-btn');
     
+    // Create the persistent image element for display
     const imgEl=document.createElement('img');
     rect.appendChild(imgEl);
     
@@ -515,87 +573,97 @@ allNodes.forEach(rect=>{
         rect.classList.add('uploaded');
         
         const reader=new FileReader();
-        reader.onload=ev=>{imgEl.src=ev.target.result};
-        reader.readAsDataURL(file);
-        
-        imgEl.onload=()=>{
-            // Create low-res preview canvas
-            const canvas=document.createElement('canvas');
-            const ctx=canvas.getContext('2d');
-            const maxW=400; 
-            const scale=Math.min(maxW/imgEl.naturalWidth,maxW/imgEl.naturalHeight,1);
-            canvas.width=imgEl.naturalWidth*scale;canvas.height=imgEl.naturalHeight*scale;
-            ctx.drawImage(imgEl,0,0,canvas.width,canvas.height);
-            imgEl.src=canvas.toDataURL('image/jpeg',0.8);
-            
-            nodeCanvases[rect.id]=canvas;
-            originalFiles[rect.id]=file;
-            rect.classList.remove('empty'); // Image loaded, remove empty class
-            
-            // Re-check visibility for downstream flow buttons
-            if(rect.id==='rootRect'){
-                topNodes.forEach(n => updateFlowButtonState(n.id));
-            } else {
-                const topIdx = topNodes.findIndex(n => n.id === rect.id);
-                if (topIdx !== -1 && botNodes[topIdx]) {
-                    // If a top node changed manually, it clears any previous generated content on the bottom node.
-                    delete nodeCanvases[botNodes[topIdx].id];
-                    botNodes[topIdx].querySelector('img').src = '';
-                    botNodes[topIdx].classList.add('empty');
-                    // Top node state changed, so update its own flow button state
-                    updateFlowButtonState(rect.id);
-                    // Update the flow button for the bottom node
-                    updateFlowButtonState(botNodes[topIdx].id);
+        reader.onload=ev=>{
+            // Use a temporary Image object to load and scale the high-res file
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                // Create low-res preview canvas
+                const canvas=document.createElement('canvas');
+                const ctx=canvas.getContext('2d');
+                const maxW=400; 
+                const scale=Math.min(maxW/tempImg.naturalWidth,maxW/tempImg.naturalHeight,1);
+                canvas.width=tempImg.naturalWidth*scale;
+                canvas.height=tempImg.naturalHeight*scale;
+                ctx.drawImage(tempImg,0,0,canvas.width,canvas.height);
+                
+                // Set the display image (imgEl) to the low-res data URL.
+                imgEl.src=canvas.toDataURL('image/jpeg',0.8);
+                
+                // Store original file and low-res canvas
+                nodeCanvases[rect.id]=canvas;
+                originalFiles[rect.id]=file;
+                rect.classList.remove('empty'); // Image loaded, remove empty class
+                
+                // --- Cascade Updates on New Upload ---
+                if(rect.id==='rootRect'){
+                    // PER USER REQUEST: Do NOT clear generated nodes when a new root is uploaded.
+                    // The images remain visually, but flow buttons are disabled by updateDownstreamFlows.
+                    // We only clear nodes that were *generated* if they had been manually uploaded themselves.
+                    topNodes.forEach(n => {
+                        // If a node was manually uploaded, it keeps the uploaded class and its data
+                        // Otherwise, we do nothing to keep the generated image displayed.
+                    });
+                    botNodes.forEach(n => {
+                        // Same here.
+                    });
+                } else {
+                    // If a top node is manually uploaded, clear its *generated* child (if any)
+                    const topIdx = topNodes.findIndex(n => n.id === rect.id);
+                    if (topIdx !== -1) {
+                         // Only clear the generated data (botN) if it's currently generated (not a manual upload)
+                         if (!botNodes[topIdx].classList.contains('uploaded')) {
+                             clearNode(botNodes[topIdx]);
+                         }
+                    }
                 }
-            }
-        }
+                
+                // Update flow button states based on new data availability
+                updateFlowButtonState(rect.id);
+                updateDownstreamFlows(rect.id);
+            };
+            tempImg.src = ev.target.result; // Start loading the image data in the temporary object
+        };
+        reader.readAsDataURL(file);
     });
 
     trashBtn?.addEventListener('click',e=>{
         e.stopPropagation();
         const rectId = rect.id;
         
-        imgEl.src='';
-        input.value='';
-        rect.classList.add('empty'); // Add empty class
-        rect.classList.remove('uploaded');
+        // 1. Clear the current node
+        clearNode(rect);
         
-        // Clear canvases and files
-        delete nodeCanvases[rectId];
-        delete originalFiles[rectId];
-
-        // Cascade clear/hide downstream nodes/buttons
+        // 2. Cascade clear logic
         if(rectId === 'rootRect'){
-            topNodes.forEach(n => {
-                delete nodeCanvases[n.id];
-                n.querySelector('img').src = '';
-                n.classList.add('empty');
-                updateFlowButtonState(n.id); // Update top flow button state
-                
-                const topIdx = topNodes.indexOf(n);
-                delete nodeCanvases[botNodes[topIdx].id];
-                botNodes[topIdx].querySelector('img').src = '';
-                botNodes[topIdx].classList.add('empty');
-                updateFlowButtonState(botNodes[topIdx].id); // Update bottom flow button state
-            });
+            // PER USER REQUEST: Do NOT clear downstream images (topNodes, botNodes). 
+            // The images remain visually, but flow buttons are disabled by updateDownstreamFlows.
+            
         } else {
             const topIdx = topNodes.findIndex(n => n.id === rectId);
-            if (topIdx !== -1 && botNodes[topIdx]) {
-                 // If a top node is cleared, clear its generated child
-                 delete nodeCanvases[botNodes[topIdx].id];
-                 botNodes[topIdx].querySelector('img').src = '';
-                 botNodes[topIdx].classList.add('empty');
-                 updateFlowButtonState(botNodes[topIdx].id);
+            const botIdx = botNodes.findIndex(n => n.id === rectId);
+
+            if (topIdx !== -1) {
+                 // If a top node is cleared, clear its dependent bottom node
+                 clearNode(botNodes[topIdx]);
+            } else if (botIdx !== -1) {
+                 // If a bottom node is cleared, nothing else needs to be cleared.
             }
         }
-        // Update flow button leading to this node
-        updateFlowButtonState(rectId);
+        
+        // Update flow button states based on data unavailability
+        updateDownstreamFlows(rectId);
     });
 
     saveBtn?.addEventListener('click',e=>{
         e.stopPropagation();
         
-        // 1. Direct manual upload exists? Save it directly.
+        // Check if the node is empty, if so, nothing to save.
+        if (rect.classList.contains('empty')) {
+            console.warn(`Cannot save: ${rect.id} is empty.`);
+            return;
+        }
+        
+        // 1. Direct manual upload exists? Save it directly. (This handles all 'uploaded' nodes)
         if (originalFiles[rect.id]) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(originalFiles[rect.id]);
@@ -604,12 +672,12 @@ allNodes.forEach(rect=>{
             return;
         }
         
-        // 2. No manual upload? Trace back to find source and process High Res.
+        // 2. No manual upload (i.e., it's a generated image)? Trace back to find source and process High Res.
         
-        // Root Node (Already handled above if file exists, if not, nothing to save)
+        // Root Node should be handled by #1 (it's only populated by upload)
         if (rect.id === 'rootRect') return;
 
-        // Top Row
+        // Top Row (Generated from Root)
         const topIdx = topNodes.findIndex(n => n.id === rect.id);
         if (topIdx !== -1) {
             if (originalFiles['rootRect']) {
@@ -618,18 +686,18 @@ allNodes.forEach(rect=>{
             return;
         }
 
-        // Bottom Row
+        // Bottom Row (Generated from Top Channel)
         const botIdx = botNodes.findIndex(n => n.id === rect.id);
         if (botIdx !== -1) {
-            // Channel index is the same as botIdx
-            const channelIdx = botIdx; 
+            const channelIdx = botIdx; // Channel index is the same as botIdx
             
-            // Check if Top Node has manual file (independent flow)
+            // If Top Node has manual file, use that as source for grayscale processing
             const topNode = topNodes[botIdx];
             if (originalFiles[topNode.id]) {
                 processHighResAndSave(originalFiles[topNode.id], 'grayscale', null);
-            } else if (originalFiles['rootRect']) {
-                // If not, use Root and apply Both filters (cascaded flow)
+            } 
+            // If Top Node was generated, use the Root and apply BOTH filters (cascaded flow)
+            else if (originalFiles['rootRect']) {
                 processHighResAndSave(originalFiles['rootRect'], 'both', channelIdx);
             }
         }
