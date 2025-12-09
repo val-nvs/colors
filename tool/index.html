@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dark Mode Bezier Layout - Image Processing</title>
 <style>
-:root{--bg:#0b0f13;--panel:#0f1720;--muted:#94a3b8;--accent:#60a5fa;}
+:root{--bg:#0b0f13;--panel:#0f1720;--muted:#94a3b8;--accent:#60a5fa;--inactive-flow:#475569;--active-flow:#facc15;}
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -24,10 +24,11 @@ body{
   padding:16px;
   width: 100%;
 }
-.top-wrap{display:flex;justify-content:center;margin:30px 0}
-.three-row{position:relative;margin:40px 0}
+/* Increased vertical spacing */
+.top-wrap{display:flex;justify-content:center;margin:40px 0}
+.three-row{position:relative;margin:60px 0}
 .row{display:flex;gap:12px;justify-content:space-between}
-.bottom-row{margin-top:30px}
+.bottom-row{margin-top:40px}
 
 /* Node Styling */
 .rect,.node{
@@ -46,10 +47,54 @@ body{
 }
 /* Only apply blue border if manually uploaded (controlled by JS toggling this class) */
 .rect.uploaded,.node.uploaded{box-shadow:0 0 0 4px rgba(96,165,250,0.6)}
-.rect img,.node img{width:100%;height:100%;object-fit:cover}
+
+/* Placeholder Text and Visuals */
+.placeholder-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* Managed by JS */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--inactive-flow); /* gray */
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px;
+  background: #1e293b;
+  z-index: 5;
+  pointer-events: none;
+}
+.placeholder-text::after {
+    content: "\A Upload or Process Image";
+    white-space: pre;
+    font-weight: 400;
+    font-size: 12px;
+    margin-top: 5px;
+    color: var(--inactive-flow);
+}
+.rect.empty .placeholder-text, .node.empty .placeholder-text {
+    display: flex; /* Show placeholder when node is 'empty' */
+}
+.rect img, .node img {
+    /* Image element is controlled by the 'empty' class */
+    display: none; 
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 10;
+}
+.rect:not(.empty) img, .node:not(.empty) img {
+    display: block; /* Show image only if not empty */
+}
+
 
 /* Buttons */
-.upload-btn,.trash-btn,.update-btn,.save-btn{
+.upload-btn,.trash-btn,.save-btn{
   position:absolute;
   border:none;
   border-radius:4px;
@@ -58,33 +103,53 @@ body{
   justify-content:center;
   cursor:pointer;
   font-size:14px;
-  z-index:10;
+  z-index:15; /* Ensure buttons are above images/placeholders */
   transition: transform 0.1s, opacity 0.2s;
 }
-.upload-btn:active, .trash-btn:active, .update-btn:active, .save-btn:active {
+.upload-btn:active, .trash-btn:active, .save-btn:active {
     transform: scale(0.95);
 }
 
 .upload-btn{top:4px;left:4px;width:28px;height:28px;background:rgba(96,165,250,0.85);color:#fff}
 .trash-btn{top:4px;right:4px;width:28px;height:28px;background:rgba(248,113,113,0.85);color:#fff}
 
+/* Flow Update Button (External to Node) - Always visible, state controlled by class */
 .update-btn{
-  bottom:4px;
-  left:4px;
-  width: 28px;
-  height: 28px;
-  background:rgba(250,204,21,0.9);
+  position:absolute;
+  width: 32px; /* Slightly larger for visibility on path */
+  height: 32px;
   color:#000;
-  border-radius:4px;
-  display:none; /* Hidden by default */
+  border-radius:50%; /* Make it round */
+  display:flex; 
+  align-items:center;
+  justify-content:center;
   font-size: 16px;
   padding: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  z-index: 20; /* Ensure it's above the SVG */
+  border: 3px solid var(--bg); /* Outline to stand out from the path */
+  transition: background-color 0.2s, opacity 0.2s, transform 0.1s;
+  cursor: pointer;
+}
+.update-btn.inactive {
+  background-color: var(--inactive-flow);
+  opacity: 0.6;
+  cursor: default;
+}
+.update-btn:not(.inactive) {
+  background-color: var(--active-flow);
+  opacity: 1;
+}
+.update-btn:not(.inactive):hover {
+    transform: scale(1.05);
+}
+.update-btn:not(.inactive):active {
+    transform: scale(0.95);
 }
 
 .save-btn{bottom:4px;right:4px;width:28px;height:28px;background:rgba(34,197,94,0.85);color:#fff}
 
-.three-row svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.three-row svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index: 1;}
 input[type='file']{display:none}
 
 /* Mobile Optimization */
@@ -97,7 +162,8 @@ input[type='file']{display:none}
   
   .row { gap: 6px; }
   
-  .upload-btn, .trash-btn, .save-btn, .update-btn { width: 24px; height: 24px; font-size: 12px; }
+  .upload-btn, .trash-btn, .save-btn { width: 24px; height: 24px; font-size: 12px; }
+  .update-btn { width: 28px; height: 28px; font-size: 14px; }
   
   .rect, .node {
     border-radius: 8px;
@@ -111,19 +177,19 @@ input[type='file']{display:none}
 <div class="card">
 <header><h1 style="color:var(--accent);font-size:16px;margin:0;text-align:center;">Image Processing Layout</h1></header>
 <section class="top-wrap">
-<div id="rootRect" class="rect"><button class="upload-btn" title="Upload">📤</button><button class="trash-btn" title="Clear">🗑️</button><button class="save-btn" title="Save High-Res">💾</button><input type="file" accept="image/*"></div>
+<div id="rootRect" class="rect empty"><div class="placeholder-text" data-text="ROOT IMAGE"></div><button class="upload-btn" title="Upload">📤</button><button class="trash-btn" title="Clear">🗑️</button><button class="save-btn" title="Save High-Res">💾</button><input type="file" accept="image/*"></div>
 </section>
 <section class="three-row" id="middleSection">
 <svg id="linksSvg" aria-hidden="true"></svg>
 <div class="row" id="topRow">
-<div class="node" id="top1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top1"><div class="placeholder-text" data-text="RED CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top2"><div class="placeholder-text" data-text="GREEN CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top3"><div class="placeholder-text" data-text="BLUE CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 <div class="row bottom-row" id="bottomRow">
-<div class="node" id="bot1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot1"><div class="placeholder-text" data-text="RED GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot2"><div class="placeholder-text" data-text="GREEN GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot3"><div class="placeholder-text" data-text="BLUE GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 </section>
 </div>
@@ -131,6 +197,7 @@ input[type='file']{display:none}
 <script>
 (function(){
 const svg=document.getElementById('linksSvg');
+const middleSection = document.getElementById('middleSection');
 const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
 const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
 const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];
@@ -143,56 +210,234 @@ let originalFiles={};
 function centerPoint(el){const rect=el.getBoundingClientRect();const parentRect=svg.getBoundingClientRect();return{x:rect.left+rect.width/2-parentRect.left,y:rect.top+rect.height/2-parentRect.top}}
 function makePath(d){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(96,165,250,0.85)');p.setAttribute('stroke-width','8');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');return p}
 
-function draw(){
-  while(svg.firstChild)svg.removeChild(svg.firstChild);
-  const container=document.getElementById('middleSection');
-  const box=container.getBoundingClientRect();
-  svg.setAttribute('width',box.width);
-  svg.setAttribute('height',box.height);
-  svg.style.width=box.width+'px';
-  svg.style.height=box.height+'px';
-  
-  const root=document.getElementById('rootRect');
-  const rootRect=root.getBoundingClientRect();
-  const svgRect=svg.getBoundingClientRect();
-  
-  const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;
-  const rootY=(rootRect.top+rootRect.height)-svgRect.top;
-  
-  topNodes.forEach(n=>{
-    const c=centerPoint(n);
-    const startX=rootX;
-    const startY=rootY;
-    const endX=c.x;
-    const endY=c.y-(n.getBoundingClientRect().height/2);
-    const cp1x=startX;
-    const cp1y=startY+Math.max(30,box.height*0.1); 
-    const cp2x=endX;
-    const cp2y=endY-Math.max(30,box.height*0.1);
-    const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-    svg.appendChild(makePath(d))
-  });
-
-  for(let i=0;i<topNodes.length;i++){
-    const topC=centerPoint(topNodes[i]);
-    const bC=centerPoint(botNodes[i]);
-    const startX=topC.x;
-    const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;
-    const endX=bC.x;
-    const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;
-    const offset=Math.max(10,(endY-startY)*0.2);
-    const cp1x=startX;
-    const cp1y=startY+offset;
-    const cp2x=endX;
-    const cp2y=endY-offset;
-    const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-    svg.appendChild(makePath(d))
-  }
+// Function to update the placeholder text content based on the data-text attribute
+function setPlaceholderText() {
+    document.querySelectorAll('.placeholder-text').forEach(p => {
+        const text = p.getAttribute('data-text');
+        p.textContent = text;
+    });
 }
 
-function toggleButton(node, show) {
-    const btn=node.querySelector('.update-btn');
-    if(btn) btn.style.display = show ? 'flex' : 'none';
+function getRelativeCenterCoords(sourceEl, targetEl) {
+    const sRect = sourceEl.getBoundingClientRect();
+    const tRect = targetEl.getBoundingClientRect();
+    const containerRect = middleSection.getBoundingClientRect();
+    const midY = (sRect.bottom + tRect.top) / 2;
+    const targetEntryX = tRect.left + tRect.width / 2;
+    
+    const relativeX = targetEntryX - containerRect.left;
+    const relativeY = midY - containerRect.top;
+
+    return { x: relativeX, y: relativeY };
+}
+
+function createFlowButton(targetId, x, y) {
+    const buttonId = `flow-${targetId}`;
+    let button = document.getElementById(buttonId);
+
+    if (!button) {
+        button = document.createElement('button');
+        button.className = 'update-btn';
+        button.id = buttonId;
+        button.dataset.targetId = targetId;
+        button.title = targetId.startsWith('top') ? "Process Channel" : "Process Grayscale";
+        button.innerHTML = '⬇️';
+        middleSection.appendChild(button);
+        button.addEventListener('click', handleUpdateClick);
+    }
+    
+    // Position the button based on calculated midpoint, adjusted for button size (32px)
+    button.style.cssText += `
+        left: ${x - 16}px; /* Center horizontally (32/2 = 16) */
+        top: ${y - 16}px;  /* Center vertically */
+    `;
+    
+    // Initial visibility check based on current state
+    updateFlowButtonState(targetId);
+}
+
+function updateFlowButtonState(targetId) {
+    const buttonId = `flow-${targetId}`;
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    
+    const targetEl = document.getElementById(targetId);
+    
+    let sourceReady = false;
+    const targetEmpty = targetEl.classList.contains('empty');
+    
+    // Determine the source readiness
+    if (targetId.startsWith('top')) {
+        // Source is 'rootRect'
+        sourceReady = !!nodeCanvases['rootRect'];
+    } else if (targetId.startsWith('bot')) {
+        // Source is corresponding 'top' node
+        const botIdx = botNodes.findIndex(n => n.id === targetId);
+        const sourceId = topNodes[botIdx]?.id;
+        sourceReady = !!nodeCanvases[sourceId];
+    }
+    
+    // Button is ACTIVE (yellow) if source is ready AND target is empty
+    if (sourceReady && targetEmpty) {
+        button.classList.remove('inactive');
+    } else {
+        // Button is INACTIVE (gray) otherwise
+        button.classList.add('inactive');
+    }
+}
+
+function draw(){
+    setPlaceholderText(); // Ensure placeholders are initialized
+
+    // 1. Clear and redraw Bezier curves
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    const container=document.getElementById('middleSection');
+    const box=container.getBoundingClientRect();
+    svg.setAttribute('width',box.width);
+    svg.setAttribute('height',box.height);
+    svg.style.width=box.width+'px';
+    svg.style.height=box.height+'px';
+    
+    const root=document.getElementById('rootRect');
+    const rootRect=root.getBoundingClientRect();
+    const svgRect=svg.getBoundingClientRect();
+    
+    const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;
+    const rootY=(rootRect.top+rootRect.height)-svgRect.top;
+    
+    // --- Draw Paths & Place Buttons for Root -> Top Row ---
+    topNodes.forEach(n=>{
+        const c=centerPoint(n);
+        const startX=rootX;
+        const startY=rootY;
+        const endX=c.x;
+        const endY=c.y-(n.getBoundingClientRect().height/2);
+        const cp1x=startX;
+        const cp1y=startY+Math.max(30,box.height*0.1); 
+        const cp2x=endX;
+        const cp2y=endY-Math.max(30,box.height*0.1);
+        const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+        svg.appendChild(makePath(d));
+        
+        const coords = getRelativeCenterCoords(root, n);
+        createFlowButton(n.id, coords.x, coords.y);
+    });
+
+    // --- Draw Paths & Place Buttons for Top Row -> Bottom Row ---
+    for(let i=0;i<topNodes.length;i++){
+        const topN = topNodes[i];
+        const botN = botNodes[i];
+
+        const topC=centerPoint(topN);
+        const bC=centerPoint(botN);
+        const startX=topC.x;
+        const startY=topN.getBoundingClientRect().bottom-svgRect.top;
+        const endX=bC.x;
+        const endY=botN.getBoundingClientRect().top-svgRect.top;
+        const offset=Math.max(10,(endY-startY)*0.2);
+        const cp1x=startX;
+        const cp1y=startY+offset;
+        const cp2x=endX;
+        const cp2y=endY-offset;
+        const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+        svg.appendChild(makePath(d));
+        
+        const coords = getRelativeCenterCoords(topN, botN);
+        createFlowButton(botN.id, coords.x, coords.y);
+    }
+}
+
+async function handleUpdateClick(e) {
+    e.stopPropagation();
+    const button = e.currentTarget;
+    const targetId = button.dataset.targetId;
+    const rect = document.getElementById(targetId);
+    
+    // Check if the button is active before proceeding
+    if (button.classList.contains('inactive')) {
+        return; 
+    }
+    
+    // Find the source canvas
+    let sourceCanvas = null;
+    let isTopRow = false;
+    let channelIdx = -1;
+    
+    if (targetId.startsWith('top')) {
+        channelIdx = topNodes.findIndex(n => n.id === targetId);
+        sourceCanvas = nodeCanvases['rootRect'];
+        isTopRow = true;
+    } else if (targetId.startsWith('bot')) {
+        const botIdx = botNodes.findIndex(n => n.id === targetId);
+        channelIdx = botIdx; 
+        const sourceId = topNodes[botIdx]?.id;
+        sourceCanvas = nodeCanvases[sourceId];
+    }
+    
+    if(!sourceCanvas) return; // Should not happen due to inactive state check
+
+    // Visual indication of work (optional, but good for UX)
+    button.innerHTML = '⚙️'; 
+    button.classList.add('inactive'); // Temporarily set inactive during processing
+    
+    const imgEl = rect.querySelector('img');
+    
+    // Start processing (using low-res canvas)
+    try {
+        const ctx=sourceCanvas.getContext('2d');
+        const imgData=ctx.getImageData(0,0,sourceCanvas.width,sourceCanvas.height);
+        
+        const newCanvas=document.createElement('canvas');
+        newCanvas.width=sourceCanvas.width;
+        newCanvas.height=sourceCanvas.height;
+        const nctx=newCanvas.getContext('2d');
+        const newData=nctx.createImageData(newCanvas.width,newCanvas.height);
+        
+        if (isTopRow) {
+            // Process RGB Channels (R=0, G=1, B=2)
+            for(let i=0;i<imgData.data.length;i+=4){
+                newData.data[i+channelIdx]=imgData.data[i+channelIdx];
+                // Zero out the other two channels
+                if(channelIdx !== 0) newData.data[i]=0; 
+                if(channelIdx !== 1) newData.data[i+1]=0;
+                if(channelIdx !== 2) newData.data[i+2]=0;
+                newData.data[i+3]=255; 
+            }
+        } else {
+            // Process Grayscale
+             for(let j=0;j<imgData.data.length;j+=4){
+                const avg = (imgData.data[j]+imgData.data[j+1]+imgData.data[j+2])/3;
+                newData.data[j] = avg;
+                newData.data[j+1] = avg;
+                newData.data[j+2] = avg;
+                newData.data[j+3] = 255;
+            }
+        }
+
+        nctx.putImageData(newData,0,0);
+        
+        // Update the display element and state
+        imgEl.src=newCanvas.toDataURL();
+        nodeCanvases[rect.id] = newCanvas;
+        rect.classList.remove('empty'); 
+        
+        // Reset button and update states downstream
+        button.innerHTML = '⬇️';
+        button.classList.add('inactive'); // The target is no longer empty, so button becomes inactive
+
+        if (isTopRow) {
+            // Processing a top node makes the corresponding bottom node ready
+            if (botNodes[channelIdx]) {
+                updateFlowButtonState(botNodes[channelIdx].id);
+            }
+        }
+
+    } catch (error) {
+        console.error("Image processing failed:", error);
+        button.innerHTML = '❌'; 
+        // Re-enable button if process failed
+        updateFlowButtonState(targetId); 
+    }
 }
 
 function processHighResAndSave(file, type, channelIdx) {
@@ -208,8 +453,10 @@ function processHighResAndSave(file, type, channelIdx) {
 
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
-
-            // Apply Channel Filter
+            
+            // --- High-Res Processing Logic ---
+            
+            // 1. Apply Channel Filter (if applicable)
             if (type === 'channel' || type === 'both') {
                  // R=0, G=1, B=2
                 for(let i=0; i<data.length; i+=4) {
@@ -220,7 +467,7 @@ function processHighResAndSave(file, type, channelIdx) {
                 }
             }
 
-            // Apply Grayscale Filter
+            // 2. Apply Grayscale Filter (if applicable)
             if (type === 'grayscale' || type === 'both') {
                 for(let i=0; i<data.length; i+=4) {
                     const avg = (data[i] + data[i+1] + data[i+2]) / 3;
@@ -254,7 +501,6 @@ allNodes.forEach(rect=>{
     const uploadBtn=rect.querySelector('.upload-btn');
     const trashBtn=rect.querySelector('.trash-btn');
     const saveBtn=rect.querySelector('.save-btn');
-    const updateBtn=rect.querySelector('.update-btn');
     
     const imgEl=document.createElement('img');
     rect.appendChild(imgEl);
@@ -284,15 +530,22 @@ allNodes.forEach(rect=>{
             
             nodeCanvases[rect.id]=canvas;
             originalFiles[rect.id]=file;
+            rect.classList.remove('empty'); // Image loaded, remove empty class
             
-            // Logic for showing buttons downstream
+            // Re-check visibility for downstream flow buttons
             if(rect.id==='rootRect'){
-                topNodes.forEach(n => toggleButton(n, true));
+                topNodes.forEach(n => updateFlowButtonState(n.id));
             } else {
-                const topIdx = topNodes.indexOf(rect);
+                const topIdx = topNodes.findIndex(n => n.id === rect.id);
                 if (topIdx !== -1 && botNodes[topIdx]) {
-                    // If a top node changed manually, show button on bottom node
-                    toggleButton(botNodes[topIdx], true);
+                    // If a top node changed manually, it clears any previous generated content on the bottom node.
+                    delete nodeCanvases[botNodes[topIdx].id];
+                    botNodes[topIdx].querySelector('img').src = '';
+                    botNodes[topIdx].classList.add('empty');
+                    // Top node state changed, so update its own flow button state
+                    updateFlowButtonState(rect.id);
+                    // Update the flow button for the bottom node
+                    updateFlowButtonState(botNodes[topIdx].id);
                 }
             }
         }
@@ -300,86 +553,43 @@ allNodes.forEach(rect=>{
 
     trashBtn?.addEventListener('click',e=>{
         e.stopPropagation();
+        const rectId = rect.id;
+        
         imgEl.src='';
         input.value='';
+        rect.classList.add('empty'); // Add empty class
         rect.classList.remove('uploaded');
-        delete nodeCanvases[rect.id];
-        delete originalFiles[rect.id];
         
-        if(rect.id==='rootRect'){
-            topNodes.forEach(n => toggleButton(n, false));
-        } else {
-            const topIdx = topNodes.indexOf(rect);
-            if (topIdx !== -1 && botNodes[topIdx]) {
-                 toggleButton(botNodes[topIdx], false);
-            }
-        }
-        toggleButton(rect, false);
-    });
+        // Clear canvases and files
+        delete nodeCanvases[rectId];
+        delete originalFiles[rectId];
 
-    updateBtn?.addEventListener('click',e=>{
-        e.stopPropagation();
-        
-        let sourceCanvas = null;
-        let isTopRow = false;
-        let topIdx = topNodes.indexOf(rect);
-        
-        if (topIdx !== -1) {
-            sourceCanvas = nodeCanvases['rootRect'];
-            isTopRow = true;
+        // Cascade clear/hide downstream nodes/buttons
+        if(rectId === 'rootRect'){
+            topNodes.forEach(n => {
+                delete nodeCanvases[n.id];
+                n.querySelector('img').src = '';
+                n.classList.add('empty');
+                updateFlowButtonState(n.id); // Update top flow button state
+                
+                const topIdx = topNodes.indexOf(n);
+                delete nodeCanvases[botNodes[topIdx].id];
+                botNodes[topIdx].querySelector('img').src = '';
+                botNodes[topIdx].classList.add('empty');
+                updateFlowButtonState(botNodes[topIdx].id); // Update bottom flow button state
+            });
         } else {
-            const botIdx = botNodes.indexOf(rect);
-            if (botIdx !== -1) {
-                sourceCanvas = nodeCanvases[topNodes[botIdx].id];
-                topIdx = botIdx;
+            const topIdx = topNodes.findIndex(n => n.id === rectId);
+            if (topIdx !== -1 && botNodes[topIdx]) {
+                 // If a top node is cleared, clear its generated child
+                 delete nodeCanvases[botNodes[topIdx].id];
+                 botNodes[topIdx].querySelector('img').src = '';
+                 botNodes[topIdx].classList.add('empty');
+                 updateFlowButtonState(botNodes[topIdx].id);
             }
         }
-        
-        if(!sourceCanvas) return;
-        
-        const ctx=sourceCanvas.getContext('2d');
-        const imgData=ctx.getImageData(0,0,sourceCanvas.width,sourceCanvas.height);
-        
-        const newCanvas=document.createElement('canvas');
-        newCanvas.width=sourceCanvas.width;
-        newCanvas.height=sourceCanvas.height;
-        const nctx=newCanvas.getContext('2d');
-        const newData=nctx.createImageData(newCanvas.width,newCanvas.height);
-        
-        if (isTopRow) {
-            // Process RGB Channels
-            for(let i=0;i<imgData.data.length;i+=4){
-                newData.data[i+topIdx]=imgData.data[i+topIdx];
-                newData.data[i+(topIdx===0?1:0)]=0; 
-                newData.data[i+(topIdx===2?1:2)]=0;
-                newData.data[i+3]=255; 
-            }
-            nctx.putImageData(newData,0,0);
-            imgEl.src=newCanvas.toDataURL();
-            nodeCanvases[rect.id] = newCanvas;
-            
-            // Hide own button
-            toggleButton(rect, false);
-            
-            // Show button for next row
-            if (botNodes[topIdx]) {
-                toggleButton(botNodes[topIdx], true);
-            }
-        } else {
-            // Process Grayscale
-             for(let j=0;j<imgData.data.length;j+=4){
-                const avg = (imgData.data[j]+imgData.data[j+1]+imgData.data[j+2])/3;
-                newData.data[j] = avg;
-                newData.data[j+1] = avg;
-                newData.data[j+2] = avg;
-                newData.data[j+3] = 255;
-            }
-            nctx.putImageData(newData,0,0);
-            imgEl.src=newCanvas.toDataURL();
-            nodeCanvases[rect.id] = newCanvas;
-            
-            toggleButton(rect, false);
-        }
+        // Update flow button leading to this node
+        updateFlowButtonState(rectId);
     });
 
     saveBtn?.addEventListener('click',e=>{
@@ -400,7 +610,7 @@ allNodes.forEach(rect=>{
         if (rect.id === 'rootRect') return;
 
         // Top Row
-        const topIdx = topNodes.indexOf(rect);
+        const topIdx = topNodes.findIndex(n => n.id === rect.id);
         if (topIdx !== -1) {
             if (originalFiles['rootRect']) {
                 processHighResAndSave(originalFiles['rootRect'], 'channel', topIdx);
@@ -409,15 +619,18 @@ allNodes.forEach(rect=>{
         }
 
         // Bottom Row
-        const botIdx = botNodes.indexOf(rect);
+        const botIdx = botNodes.findIndex(n => n.id === rect.id);
         if (botIdx !== -1) {
-            // Check if Top Node has manual file
+            // Channel index is the same as botIdx
+            const channelIdx = botIdx; 
+            
+            // Check if Top Node has manual file (independent flow)
             const topNode = topNodes[botIdx];
             if (originalFiles[topNode.id]) {
                 processHighResAndSave(originalFiles[topNode.id], 'grayscale', null);
             } else if (originalFiles['rootRect']) {
-                // If not, use Root and apply Both filters
-                processHighResAndSave(originalFiles['rootRect'], 'both', botIdx);
+                // If not, use Root and apply Both filters (cascaded flow)
+                processHighResAndSave(originalFiles['rootRect'], 'both', channelIdx);
             }
         }
     });
