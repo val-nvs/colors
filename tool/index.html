@@ -1,6 +1,3 @@
-<!--
-Enhanced version: all rectangles can upload images, compression applied, R/G/B channels via update button in first row, upload indicator via box-shadow, save works.
--->
 <!doctype html>
 <html lang="en">
 <head>
@@ -54,12 +51,16 @@ input[type='file']{display:none}
 (function(){
 const svg=document.getElementById('linksSvg');
 const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
-let compressedImageData=null,originalFile=null;
+const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
+let compressedImages={};
+let originalFiles={};
 function centerPoint(el){const rect=el.getBoundingClientRect();const parentRect=svg.getBoundingClientRect();return{x:rect.left+rect.width/2-parentRect.left,y:rect.top+rect.height/2-parentRect.top}}
 function makePath(d){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(96,165,250,0.85)');p.setAttribute('stroke-width','8');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');return p}
-function draw(){while(svg.firstChild)svg.removeChild(svg.firstChild);const container=document.getElementById('middleSection');const box=container.getBoundingClientRect();svg.setAttribute('width',box.width);svg.setAttribute('height',box.height);svg.style.width=box.width+'px';svg.style.height=box.height+'px';const root=document.getElementById('rootRect');const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];const rootRect=root.getBoundingClientRect();const svgRect=svg.getBoundingClientRect();const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;const rootY=(rootRect.top+rootRect.height)-svgRect.top;topNodes.forEach(n=>{const c=centerPoint(n);const startX=rootX;const startY=rootY;const endX=c.x;const endY=c.y-(n.getBoundingClientRect().height/2);const cp1x=startX;const cp1y=startY+Math.max(60,box.height*0.14);const cp2x=endX;const cp2y=endY-Math.max(60,box.height*0.14);const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))});for(let i=0;i<topNodes.length;i++){const topC=centerPoint(topNodes[i]);const botC=centerPoint(botNodes[i]);const startX=topC.x;const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;const endX=botC.x;const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;const offset=Math.max(10,(endY-startY)*0.18);const cp1x=startX;const cp1y=startY+offset;const cp2x=endX;const cp2y=endY-offset;const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))}
+function draw(){while(svg.firstChild)svg.removeChild(svg.firstChild);const container=document.getElementById('middleSection');const box=container.getBoundingClientRect();svg.setAttribute('width',box.width);svg.setAttribute('height',box.height);svg.style.width=box.width+'px';svg.style.height=box.height+'px';const root=document.getElementById('rootRect');const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];const rootRect=root.getBoundingClientRect();const svgRect=svg.getBoundingClientRect();const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;const rootY=(rootRect.top+rootRect.height)-svgRect.top;topNodes.forEach(n=>{const c=centerPoint(n);const startX=rootX;const startY=rootY;const endX=c.x;const endY=c.y-(n.getBoundingClientRect().height/2);const cp1x=startX;const cp1y=startY+Math.max(60,box.height*0.14);const cp2x=endX;const cp2y=endY-Math.max(60,box.height*0.14);const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))});for(let i=0;i<topNodes.length;i++){const topC=centerPoint(topNodes[i]);const botC=centerPoint(botNodes[i]);const startX=topC.x;const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;const endX=botC.x;const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;const offset=Math.max(10,(endY-startY)*0.18);const cp1x=startX;const cp1y=startY+offset;const cp2x=endX;const cp2y=endY-offset;const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))}
 }
-window.addEventListener('load',draw);window.addEventListener('resize',()=>{if(window._drawRaf)cancelAnimationFrame(window._drawRaf);window._drawRaf=requestAnimationFrame(draw)});setTimeout(draw,400);
+window.addEventListener('load',draw);
+window.addEventListener('resize',()=>{if(window._drawRaf)cancelAnimationFrame(window._drawRaf);window._drawRaf=requestAnimationFrame(draw)});
+setTimeout(draw,400);
 allNodes.forEach(rect=>{
 const input=rect.querySelector('input[type=file]');
 const uploadBtn=rect.querySelector('.upload-btn');
@@ -83,13 +84,11 @@ const maxW=200;
 const scale=Math.min(maxW/imgEl.naturalWidth,maxW/imgEl.naturalHeight,1);
 canvas.width=imgEl.naturalWidth*scale;canvas.height=imgEl.naturalHeight*scale;
 ctx.drawImage(imgEl,0,0,canvas.width,canvas.height);
+imgEl.src=canvas.toDataURL('image/jpeg',0.7);
+compressedImages[rect.id]=canvas;
+originalFiles[rect.id]=file;
 if(rect.id==='rootRect'){
-originalFile=file;
-compressedImageData=canvas;
-[topNodes[0],topNodes[1],topNodes[2]].forEach(n=>{n.querySelector('.update-btn').style.display='flex'});
-imgEl.src=canvas.toDataURL('image/jpeg',0.7);
-}else{
-imgEl.src=canvas.toDataURL('image/jpeg',0.7);
+topNodes.forEach(n=>{n.querySelector('.update-btn').style.display='flex'});
 }
 }
 });
@@ -98,40 +97,61 @@ e.stopPropagation();
 imgEl.src='';
 input.value='';
 rect.classList.remove('uploaded');
+delete compressedImages[rect.id];
+delete originalFiles[rect.id];
 if(rect.id==='rootRect'){
-compressedImageData=null;
-originalFile=null;
-[topNodes[0],topNodes[1],topNodes[2]].forEach(n=>{n.querySelector('.update-btn').style.display='none'})
+topNodes.forEach(n=>{n.querySelector('.update-btn').style.display='none'});
 }
 });
 updateBtn?.addEventListener('click',e=>{
 e.stopPropagation();
-if(!compressedImageData)return;
-const idx=[topNodes[0],topNodes[1],topNodes[2]].indexOf(rect);
+if(!compressedImages['rootRect'])return;
+const idx=topNodes.indexOf(rect);
 if(idx===-1)return;
-const ctx=compressedImageData.getContext('2d');
-const imgData=ctx.getImageData(0,0,compressedImageData.width,compressedImageData.height);
+const canvas=compressedImages['rootRect'];
+const ctx=canvas.getContext('2d');
+const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
 const channelCanvas=document.createElement('canvas');
-channelCanvas.width=compressedImageData.width;
-channelCanvas.height=compressedImageData.height;
+channelCanvas.width=canvas.width;
+channelCanvas.height=canvas.height;
 const cctx=channelCanvas.getContext('2d');
 const newData=cctx.createImageData(channelCanvas.width,channelCanvas.height);
-for(let i=0;i<imgData.data.length;i+=4){const val=imgData.data[i+idx];newData.data[i]=newData.data[i+1]=newData.data[i+2]=val;newData.data[i+3]=255}
+for(let i=0;i<imgData.data.length;i+=4){
+const val=imgData.data[i+idx];
+newData.data[i]=newData.data[i+1]=newData.data[i+2]=val;
+newData.data[i+3]=255;
+}
 cctx.putImageData(newData,0,0);
 imgEl.src=channelCanvas.toDataURL();
 });
 saveBtn?.addEventListener('click',e=>{
 e.stopPropagation();
-if(!originalFile)return;
-let downloadUrl;
-if(rect.classList.contains('node')&&[topNodes[0],topNodes[1],topNodes[2]].includes(rect)&&rect.querySelector('img')){
-downloadUrl=rect.querySelector('img').src;
-}else downloadUrl=URL.createObjectURL(originalFile);
+if(!originalFiles[rect.id] && !originalFiles['rootRect'])return;
+let originalFile=originalFiles[rect.id] || originalFiles['rootRect'];
+const imgObj=new Image();
+imgObj.onload=()=>{
+const canvas=document.createElement('canvas');
+canvas.width=imgObj.naturalWidth;
+canvas.height=imgObj.naturalHeight;
+const ctx=canvas.getContext('2d');
+ctx.drawImage(imgObj,0,0);
+// Apply same channel filter if it's a top row node
+const idx=topNodes.indexOf(rect);
+if(idx!==-1){
+const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+for(let i=0;i<imgData.data.length;i+=4){
+const val=imgData.data[i+idx];
+imgData.data[i]=imgData.data[i+1]=imgData.data[i+2]=val;
+imgData.data[i+3]=255;
+}
+ctx.putImageData(imgData,0,0);
+}
 const a=document.createElement('a');
-a.href=downloadUrl;
+a.href=canvas.toDataURL('image/png');
 a.download='processed_'+originalFile.name;
 a.click();
-if(downloadUrl.startsWith('blob:'))URL.revokeObjectURL(downloadUrl);
+};
+imgObj.src=URL.createObjectURL(originalFile);
 });
 });
 })();
