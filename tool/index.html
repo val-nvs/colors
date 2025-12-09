@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dark Mode Bezier Layout - Image Processing</title>
 <style>
+/* Using 1rem = 16px conversion */
 :root{--bg:#0b0f13;--panel:#0f1720;--muted:#94a3b8;--accent:#60a5fa;--inactive-flow:#475569;--active-flow:#facc15;}
 *{box-sizing:border-box}
 body{
   margin:0;
-  padding:20px;
+  padding:1.25rem; /* 20px -> 1.25rem */
   font-family:Inter,sans-serif;
   background:linear-gradient(180deg,var(--bg),#061018 120%);
   color:var(--muted);
@@ -17,25 +18,26 @@ body{
   justify-content:center;
   min-height: 100vh;
 }
-.container{max-width:1100px;width:100%}
+.container{max-width:68.75rem;width:100%} /* 1100px -> 68.75rem */
 .card{
   background:linear-gradient(180deg,var(--panel),#0b1220);
-  border-radius:12px;
-  padding:16px;
+  border-radius:0.75rem; /* 12px -> 0.75rem */
+  padding:1rem; /* 16px -> 1rem */
   width: 100%;
 }
 /* Increased vertical spacing */
-.top-wrap{display:flex;justify-content:center;margin:40px 0}
-.three-row{position:relative;margin:60px 0}
-.row{display:flex;gap:12px;justify-content:space-between}
-.bottom-row{margin-top:40px}
+.top-wrap{display:flex;justify-content:center;margin:5rem 0} /* Increased from 3.75rem (60px) to 5rem (80px) */
+.three-row{position:relative;margin:8rem 0} /* Increased from 6.25rem (100px) to 8rem (128px) */
+.row{display:flex;gap:0.75rem;justify-content:space-between} /* 12px -> 0.75rem */
+.bottom-row{margin-top:6rem} /* Increased from 5rem (80px) to 6rem (96px) */
 
 /* Node Styling */
 .rect,.node{
-  width:260px;
+  /* Width is now flexible, adapting to container width via max-width */
+  width:clamp(8rem, 31vw, 16.25rem); /* Flexible width, 260px is max */
   max-width: 31%;
   aspect-ratio:3/2;
-  border-radius:12px;
+  border-radius:0.75rem;
   background:#1e293b;
   display:flex;
   align-items:center;
@@ -46,41 +48,10 @@ body{
   flex-shrink: 1;
 }
 /* Only apply blue border if manually uploaded (controlled by JS toggling this class) */
-.rect.uploaded,.node.uploaded{box-shadow:0 0 0 4px rgba(96,165,250,0.6)}
+.rect.uploaded,.node.uploaded{box-shadow:0 0 0 0.25rem rgba(96,165,250,0.6)} /* 4px -> 0.25rem */
 
-/* Placeholder Text and Visuals */
-.placeholder-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* Managed by JS */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--inactive-flow); /* gray */
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  padding: 10px;
-  background: #1e293b;
-  z-index: 5;
-  pointer-events: none;
-}
-.placeholder-text::after {
-    content: "\A Upload or Process Image";
-    white-space: pre;
-    font-weight: 400;
-    font-size: 12px;
-    margin-top: 5px;
-    color: var(--inactive-flow);
-}
-.rect.empty .placeholder-text, .node.empty .placeholder-text {
-    display: flex; /* Show placeholder when node is 'empty' */
-}
+/* Images are the only content in non-empty nodes */
 .rect img, .node img {
-    /* Image element is controlled by the 'empty' class */
     display: none; 
     width: 100%;
     height: 100%;
@@ -97,37 +68,37 @@ body{
 .upload-btn,.trash-btn,.save-btn{
   position:absolute;
   border:none;
-  border-radius:4px;
+  border-radius:0.25rem; /* 4px -> 0.25rem */
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  font-size:14px;
-  z-index:15; /* Ensure buttons are above images/placeholders */
+  font-size:0.875rem; /* 14px -> 0.875rem */
+  z-index:15; 
   transition: transform 0.1s, opacity 0.2s;
 }
 .upload-btn:active, .trash-btn:active, .save-btn:active {
     transform: scale(0.95);
 }
 
-.upload-btn{top:4px;left:4px;width:28px;height:28px;background:rgba(96,165,250,0.85);color:#fff}
-.trash-btn{top:4px;right:4px;width:28px;height:28px;background:rgba(248,113,113,0.85);color:#fff}
+.upload-btn{top:0.25rem;left:0.25rem;width:1.75rem;height:1.75rem;background:rgba(96,165,250,0.85);color:#fff} /* 4px, 28px -> 0.25rem, 1.75rem */
+.trash-btn{top:0.25rem;right:0.25rem;width:1.75rem;height:1.75rem;background:rgba(248,113,113,0.85);color:#fff}
 
 /* Flow Update Button (External to Node) - Always visible, state controlled by class */
 .update-btn{
   position:absolute;
-  width: 32px; /* Slightly larger for visibility on path */
-  height: 32px;
+  width: 2rem; /* 32px -> 2rem */
+  height: 2rem;
   color:#000;
-  border-radius:50%; /* Make it round */
+  border-radius:50%;
   display:flex; 
   align-items:center;
   justify-content:center;
-  font-size: 16px;
+  font-size: 1rem; /* 16px -> 1rem */
   padding: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-  z-index: 20; /* Ensure it's above the SVG */
-  border: 3px solid var(--bg); /* Outline to stand out from the path */
+  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.4); /* px -> rem */
+  z-index: 20; 
+  border: 0.1875rem solid var(--bg); /* 3px -> 0.1875rem */
   transition: background-color 0.2s, opacity 0.2s, transform 0.1s;
   cursor: pointer;
 }
@@ -147,26 +118,26 @@ body{
     transform: scale(0.95);
 }
 
-.save-btn{bottom:4px;right:4px;width:28px;height:28px;background:rgba(34,197,94,0.85);color:#fff}
+.save-btn{bottom:0.25rem;right:0.25rem;width:1.75rem;height:1.75rem;background:rgba(34,197,94,0.85);color:#fff}
 
 .three-row svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index: 1;}
 input[type='file']{display:none}
 
-/* Mobile Optimization */
-@media (max-width: 768px) {
-  body { padding: 8px; }
-  .card { padding: 10px; }
-  .top-wrap { margin: 16px 0; }
-  .three-row { margin: 20px 0; }
-  .bottom-row { margin-top: 16px; }
+/* Mobile Optimization for small screens (e.g., iPhone 8) */
+@media (max-width: 480px) {
+  body { padding: 0.5rem; } /* 8px -> 0.5rem */
+  .card { padding: 0.625rem; } /* 10px -> 0.625rem */
+  .top-wrap { margin: 1.5rem 0; } /* Adjusted spacing for mobile */
+  .three-row { margin: 2rem 0; } /* Adjusted spacing for mobile */
+  .bottom-row { margin-top: 1.5rem; } /* Adjusted spacing for mobile */
   
-  .row { gap: 6px; }
+  .row { gap: 0.375rem; } /* 6px -> 0.375rem */
   
-  .upload-btn, .trash-btn, .save-btn { width: 24px; height: 24px; font-size: 12px; }
-  .update-btn { width: 28px; height: 28px; font-size: 14px; }
+  .upload-btn, .trash-btn, .save-btn { width: 1.5rem; height: 1.5rem; font-size: 0.75rem; } /* 24px, 12px -> 1.5rem, 0.75rem */
+  .update-btn { width: 1.75rem; height: 1.75rem; font-size: 0.875rem; } /* 28px, 14px -> 1.75rem, 0.875rem */
   
   .rect, .node {
-    border-radius: 8px;
+    border-radius: 0.5rem; /* 8px -> 0.5rem */
     width: 32%; 
   }
 }
@@ -175,21 +146,21 @@ input[type='file']{display:none}
 <body>
 <div class="container">
 <div class="card">
-<header><h1 style="color:var(--accent);font-size:16px;margin:0;text-align:center;">Image Processing Layout</h1></header>
+<header><h1 style="color:var(--accent);font-size:1rem;margin:0;text-align:center;">Image Processing Layout</h1></header>
 <section class="top-wrap">
-<div id="rootRect" class="rect empty"><div class="placeholder-text" data-text="ROOT IMAGE"></div><button class="upload-btn" title="Upload">📤</button><button class="trash-btn" title="Clear">🗑️</button><button class="save-btn" title="Save High-Res">💾</button><input type="file" accept="image/*"></div>
+<div id="rootRect" class="rect empty"><button class="upload-btn" title="Upload">📤</button><button class="trash-btn" title="Clear">🗑️</button><button class="save-btn" title="Save High-Res">💾</button><input type="file" accept="image/*"></div>
 </section>
 <section class="three-row" id="middleSection">
 <svg id="linksSvg" aria-hidden="true"></svg>
 <div class="row" id="topRow">
-<div class="node empty" id="top1"><div class="placeholder-text" data-text="RED CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node empty" id="top2"><div class="placeholder-text" data-text="GREEN CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node empty" id="top3"><div class="placeholder-text" data-text="BLUE CHANNEL"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="top3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 <div class="row bottom-row" id="bottomRow">
-<div class="node empty" id="bot1"><div class="placeholder-text" data-text="RED GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node empty" id="bot2"><div class="placeholder-text" data-text="GREEN GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node empty" id="bot3"><div class="placeholder-text" data-text="BLUE GRAYSCALE"></div><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node empty" id="bot3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 </section>
 </div>
@@ -199,9 +170,13 @@ input[type='file']{display:none}
 const svg=document.getElementById('linksSvg');
 const middleSection = document.getElementById('middleSection');
 const rootRect = document.getElementById('rootRect');
-const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
-const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
-const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];
+// Dynamically get the currently rendered nodes to support non-3 rows
+const topRow = document.getElementById('topRow');
+const bottomRow = document.getElementById('bottomRow');
+const topNodes = Array.from(topRow.querySelectorAll('.node'));
+const botNodes = Array.from(bottomRow.querySelectorAll('.node'));
+const allNodes = [rootRect, ...topNodes, ...botNodes];
+
 
 // Store low-res canvases for display
 let nodeCanvases={};
@@ -209,23 +184,30 @@ let nodeCanvases={};
 let originalFiles={};
 
 function centerPoint(el){const rect=el.getBoundingClientRect();const parentRect=svg.getBoundingClientRect();return{x:rect.left+rect.width/2-parentRect.left,y:rect.top+rect.height/2-parentRect.top}}
-function makePath(d){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(96,165,250,0.85)');p.setAttribute('stroke-width','8');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');return p}
 
-// Function to update the placeholder text content based on the data-text attribute
-function setPlaceholderText() {
-    document.querySelectorAll('.placeholder-text').forEach(p => {
-        const text = p.getAttribute('data-text');
-        p.textContent = text;
-    });
+function makePath(d){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',d);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke','rgba(96,165,250,0.85)');
+    p.setAttribute('stroke-width','12'); 
+    p.setAttribute('stroke-linecap','round');
+    p.setAttribute('stroke-linejoin','round');
+    return p
 }
 
+// Function to calculate the relative center point between two nodes
 function getRelativeCenterCoords(sourceEl, targetEl) {
     const sRect = sourceEl.getBoundingClientRect();
     const tRect = targetEl.getBoundingClientRect();
     const containerRect = middleSection.getBoundingClientRect();
+    
+    // Midpoint Y in document coordinates
     const midY = (sRect.bottom + tRect.top) / 2;
+    // Target X (center of the line entry) in document coordinates
     const targetEntryX = tRect.left + tRect.width / 2;
     
+    // Convert to relative coordinates inside middleSection
     const relativeX = targetEntryX - containerRect.left;
     const relativeY = midY - containerRect.top;
 
@@ -247,10 +229,12 @@ function createFlowButton(targetId, x, y) {
         button.addEventListener('click', handleUpdateClick);
     }
     
-    // Position the button based on calculated midpoint, adjusted for button size (32px)
+    // Position the button based on calculated junction point, adjusted for button size (2rem = 32px)
+    // 1rem (16px) for horizontal centering (32/2)
+    // 1rem (16px) for vertical centering (32/2) - this positions the button's center at (x, y)
     button.style.cssText += `
-        left: ${x - 16}px; /* Center horizontally (32/2 = 16) */
-        top: ${y - 16}px;  /* Center vertically */
+        left: ${x - 16}px; 
+        top: ${y - 16}px; 
     `;
     
     // Initial visibility check based on current state
@@ -279,12 +263,10 @@ function updateFlowButtonState(targetId) {
     }
     
     // Button is ACTIVE (yellow) if source is ready AND target is empty
-    // Button is INACTIVE (gray) otherwise
     if (sourceReady && targetEmpty) {
         button.classList.remove('inactive');
     } else {
         button.classList.add('inactive');
-        // If processing failed before and the error icon '❌' is shown, replace it with the default '⬇️'
         if (button.innerHTML === '❌' || button.innerHTML === '⚙️') {
              button.innerHTML = '⬇️';
         }
@@ -292,8 +274,6 @@ function updateFlowButtonState(targetId) {
 }
 
 function draw(){
-    setPlaceholderText(); // Ensure placeholders are initialized
-
     // 1. Clear and redraw Bezier curves
     while(svg.firstChild)svg.removeChild(svg.firstChild);
     const container=document.getElementById('middleSection');
@@ -313,42 +293,98 @@ function draw(){
     // --- Draw Paths & Place Buttons for Root -> Top Row ---
     topNodes.forEach(n=>{
         const c=centerPoint(n);
+        
+        // 1. Calculate Button Center Coords (x_btn, y_btn)
+        const coords = getRelativeCenterCoords(root, n); 
+        const x_btn = coords.x;
+        const y_btn = coords.y; 
+
+        // Start and End of the overall path
         const startX=rootX;
         const startY=rootY;
         const endX=c.x;
         const endY=c.y-(n.getBoundingClientRect().height/2);
-        const cp1x=startX;
-        const cp1y=startY+Math.max(30,box.height*0.1); 
-        const cp2x=endX;
-        const cp2y=endY-Math.max(30,box.height*0.1);
-        const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-        svg.appendChild(makePath(d));
         
-        const coords = getRelativeCenterCoords(root, n);
-        createFlowButton(n.id, coords.x, coords.y);
+        // Vertical distance for the first segment (Root to Button)
+        const distY1 = y_btn - startY;
+        const V_OFFSET_1 = distY1 * 0.6; // 60% offset for graceful S-curve
+
+        // --- Path 1: Root Bottom -> Button Center (Guaranteed vertical tangency at start/end) ---
+        // CP1: X matches startX. CP2: X matches x_btn. This forces the vertical tangent.
+        const cp1_1x = startX;
+        const cp1_1y = startY + V_OFFSET_1; 
+        const cp1_2x = x_btn;
+        const cp1_2y = y_btn - V_OFFSET_1; 
+        
+        const d1=`M ${startX},${startY} C ${cp1_1x},${cp1_1y} ${cp1_2x},${cp1_2y} ${x_btn},${y_btn}`;
+        svg.appendChild(makePath(d1));
+
+        // Vertical distance for the second segment (Button to Node)
+        const distY2 = y_btn - endY;
+        const V_OFFSET_2 = distY2 * 0.6; // 60% offset for graceful S-curve
+
+        // --- Path 2: Button Center -> Top Node Top (Guaranteed vertical tangency at start/end) ---
+        // CP1: X matches x_btn. CP2: X matches endX.
+        const cp2_1x = x_btn;
+        const cp2_1y = y_btn - V_OFFSET_2; 
+        const cp2_2x = endX;
+        const cp2_2y = endY + V_OFFSET_2; 
+        
+        const d2=`M ${x_btn},${y_btn} C ${cp2_1x},${cp2_1y} ${cp2_2x},${cp2_2y} ${endX},${endY}`;
+        svg.appendChild(makePath(d2));
+
+        // Create the button at the midpoint
+        createFlowButton(n.id, x_btn, y_btn);
     });
 
-    // --- Draw Paths & Place Buttons for Top Row -> Bottom Row ---
-    for(let i=0;i<topNodes.length;i++){
+    // --- Draw Paths & Place Buttons for Top Row -> Bottom Row (Using smooth S-curve logic) ---
+    const maxConnections = Math.min(topNodes.length, botNodes.length);
+
+    for(let i=0;i<maxConnections;i++){
         const topN = topNodes[i];
         const botN = botNodes[i];
 
         const topC=centerPoint(topN);
         const bC=centerPoint(botN);
+
+        // 1. Calculate Button Center Coords (x_btn, y_btn)
+        const coords = getRelativeCenterCoords(topN, botN); 
+        const x_btn = coords.x;
+        const y_btn = coords.y; 
+        
+        // Start and End of the overall path
         const startX=topC.x;
         const startY=topN.getBoundingClientRect().bottom-svgRect.top;
         const endX=bC.x;
         const endY=botN.getBoundingClientRect().top-svgRect.top;
-        const offset=Math.max(10,(endY-startY)*0.2);
-        const cp1x=startX;
-        const cp1y=startY+offset;
-        const cp2x=endX;
-        const cp2y=endY-offset;
-        const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-        svg.appendChild(makePath(d));
         
-        const coords = getRelativeCenterCoords(topN, botN);
-        createFlowButton(botN.id, coords.x, coords.y);
+        // Vertical distance for the first segment (Top Node to Button)
+        const distY1 = y_btn - startY;
+        const V_OFFSET_1 = distY1 * 0.6; // 60% offset for graceful S-curve
+
+        // --- Path 1: Top Node Bottom -> Button Center (Guaranteed vertical tangency at start/end) ---
+        const cp1_1x=startX;
+        const cp1_1y=startY + V_OFFSET_1;
+        const cp1_2x=x_btn;
+        const cp1_2y=y_btn - V_OFFSET_1; 
+        
+        const d1=`M ${startX},${startY} C ${cp1_1x},${cp1_1y} ${cp1_2x},${cp1_2y} ${x_btn},${y_btn}`;
+        svg.appendChild(makePath(d1));
+
+        // Vertical distance for the second segment (Button to Bottom Node)
+        const distY2 = y_btn - endY;
+        const V_OFFSET_2 = distY2 * 0.6; // 60% offset for graceful S-curve
+        
+        // --- Path 2: Button Center -> Bottom Node Top (Guaranteed vertical tangency at start/end) ---
+        const cp2_1x=x_btn;
+        const cp2_1y=y_btn - V_OFFSET_2;
+        const cp2_2x=endX;
+        const cp2_2y=endY + V_OFFSET_2;
+        
+        const d2=`M ${x_btn},${y_btn} C ${cp2_1x},${cp2_1y} ${cp2_2x},${cp2_2y} ${endX},${endY}`;
+        svg.appendChild(makePath(d2));
+        
+        createFlowButton(botN.id, x_btn, y_btn);
     }
 }
 
@@ -359,7 +395,7 @@ function clearNode(nodeEl) {
     const input = nodeEl.querySelector('input[type=file]');
 
     imgEl.src = '';
-    if (input) input.value = ''; // Only clear input if it exists
+    if (input) input.value = ''; 
     
     nodeEl.classList.add('empty');
     nodeEl.classList.remove('uploaded');
@@ -374,18 +410,15 @@ function clearNode(nodeEl) {
 // Helper to update downstream flow button states
 function updateDownstreamFlows(rectId) {
     if(rectId === 'rootRect'){
-        // If root is modified/cleared, disable all top-row processing buttons
-        // but do *not* clear the images themselves.
-        topNodes.forEach(n => {
+        topNodes.forEach((n, idx) => {
             updateFlowButtonState(n.id); 
-            // Also update the buttons for the bottom row, as the ultimate source is now missing
-            const topIdx = topNodes.indexOf(n);
-            updateFlowButtonState(botNodes[topIdx].id);
+            if (botNodes[idx]) {
+                updateFlowButtonState(botNodes[idx].id);
+            }
         });
     } else {
         const topIdx = topNodes.findIndex(n => n.id === rectId);
         if (topIdx !== -1 && botNodes[topIdx]) {
-            // Only update state for the downstream bot node
             updateFlowButtonState(botNodes[topIdx].id);
         }
     }
@@ -397,12 +430,10 @@ async function handleUpdateClick(e) {
     const targetId = button.dataset.targetId;
     const rect = document.getElementById(targetId);
     
-    // Check if the button is active before proceeding
     if (button.classList.contains('inactive')) {
         return; 
     }
     
-    // Find the source canvas
     let sourceCanvas = null;
     let isTopRow = false;
     let channelIdx = -1;
@@ -418,11 +449,11 @@ async function handleUpdateClick(e) {
         sourceCanvas = nodeCanvases[sourceId];
     }
     
-    if(!sourceCanvas) return; // Should not happen due to inactive state check
+    if(!sourceCanvas) return; 
 
     // Visual indication of work
     button.innerHTML = '⚙️'; 
-    button.classList.add('inactive'); // Temporarily set inactive during processing
+    button.classList.add('inactive'); 
     
     const imgEl = rect.querySelector('img');
     let success = false;
@@ -442,7 +473,6 @@ async function handleUpdateClick(e) {
             // Process RGB Channels (R=0, G=1, B=2)
             for(let i=0;i<imgData.data.length;i+=4){
                 newData.data[i+channelIdx]=imgData.data[i+channelIdx];
-                // Zero out the other two channels
                 if(channelIdx !== 0) newData.data[i]=0; 
                 if(channelIdx !== 1) newData.data[i+1]=0;
                 if(channelIdx !== 2) newData.data[i+2]=0;
@@ -452,22 +482,19 @@ async function handleUpdateClick(e) {
             // Process Grayscale (R=0, G=1, B=2) - Correctly use intensity of the specified channel only.
             const componentIndex = channelIdx; 
              for(let j=0;j<imgData.data.length;j+=4){
-                // Use the intensity of the specific channel in the source image
                 const intensity = imgData.data[j + componentIndex]; 
                 
-                newData.data[j] = intensity;   // New Red = Intensity
-                newData.data[j+1] = intensity; // New Green = Intensity
-                newData.data[j+2] = intensity; // New Blue = Intensity
-                newData.data[j+3] = 255;       // Alpha
+                newData.data[j] = intensity;   
+                newData.data[j+1] = intensity; 
+                newData.data[j+2] = intensity; 
+                newData.data[j+3] = 255;       
             }
         }
 
         nctx.putImageData(newData,0,0);
         
-        // Use synchronous assignment
         imgEl.src = newCanvas.toDataURL();
 
-        // Update the display element and state immediately.
         nodeCanvases[rect.id] = newCanvas;
         rect.classList.remove('empty'); 
         
@@ -475,14 +502,12 @@ async function handleUpdateClick(e) {
 
     } catch (error) {
         console.error("Image processing failed:", error);
-        button.innerHTML = '❌'; // Show failure icon
+        button.innerHTML = '❌'; 
     } finally {
-        // Guarantee button reset and state update
         if (success) {
             button.innerHTML = '⬇️';
         }
         
-        // Update state of the current flow button (targetId) and downstream nodes
         updateFlowButtonState(targetId);
         updateDownstreamFlows(targetId);
     }
@@ -506,7 +531,6 @@ function processHighResAndSave(file, type, channelIdx) {
             
             // 1. Apply Channel Filter (if applicable)
             if (type === 'channel' || type === 'both') {
-                 // R=0, G=1, B=2
                 for(let i=0; i<data.length; i+=4) {
                     if (channelIdx !== 0) data[i] = 0;
                     if (channelIdx !== 1) data[i+1] = 0;
@@ -521,10 +545,8 @@ function processHighResAndSave(file, type, channelIdx) {
                 for(let i=0; i<data.length; i+=4) {
                     let intensity;
                     if (componentIndex !== null) {
-                        // Channel Grayscale (e.g., Red Grayscale) - Uses only the specified channel intensity
                         intensity = data[i + componentIndex]; 
                     } else {
-                        // Standard Grayscale (if processing a non-channel specific manual upload) - Uses average
                         intensity = (data[i] + data[i+1] + data[i+2]) / 3;
                     }
                     
@@ -569,15 +591,12 @@ allNodes.forEach(rect=>{
         const file=e.target.files[0];
         if(!file)return;
         
-        // Manual Upload gets the blue border
         rect.classList.add('uploaded');
         
         const reader=new FileReader();
         reader.onload=ev=>{
-            // Use a temporary Image object to load and scale the high-res file
             const tempImg = new Image();
             tempImg.onload = () => {
-                // Create low-res preview canvas
                 const canvas=document.createElement('canvas');
                 const ctx=canvas.getContext('2d');
                 const maxW=400; 
@@ -586,42 +605,29 @@ allNodes.forEach(rect=>{
                 canvas.height=tempImg.naturalHeight*scale;
                 ctx.drawImage(tempImg,0,0,canvas.width,canvas.height);
                 
-                // Set the display image (imgEl) to the low-res data URL.
                 imgEl.src=canvas.toDataURL('image/jpeg',0.8);
                 
-                // Store original file and low-res canvas
                 nodeCanvases[rect.id]=canvas;
                 originalFiles[rect.id]=file;
-                rect.classList.remove('empty'); // Image loaded, remove empty class
+                rect.classList.remove('empty'); 
                 
                 // --- Cascade Updates on New Upload ---
                 if(rect.id==='rootRect'){
-                    // PER USER REQUEST: Do NOT clear generated nodes when a new root is uploaded.
-                    // The images remain visually, but flow buttons are disabled by updateDownstreamFlows.
-                    // We only clear nodes that were *generated* if they had been manually uploaded themselves.
-                    topNodes.forEach(n => {
-                        // If a node was manually uploaded, it keeps the uploaded class and its data
-                        // Otherwise, we do nothing to keep the generated image displayed.
-                    });
-                    botNodes.forEach(n => {
-                        // Same here.
-                    });
+                    // Update flow button states based on new data availability
+                    updateFlowButtonState(rect.id);
+                    updateDownstreamFlows(rect.id);
                 } else {
-                    // If a top node is manually uploaded, clear its *generated* child (if any)
                     const topIdx = topNodes.findIndex(n => n.id === rect.id);
                     if (topIdx !== -1) {
-                         // Only clear the generated data (botN) if it's currently generated (not a manual upload)
                          if (!botNodes[topIdx].classList.contains('uploaded')) {
                              clearNode(botNodes[topIdx]);
                          }
                     }
+                    updateFlowButtonState(rect.id);
+                    updateDownstreamFlows(rect.id);
                 }
-                
-                // Update flow button states based on new data availability
-                updateFlowButtonState(rect.id);
-                updateDownstreamFlows(rect.id);
             };
-            tempImg.src = ev.target.result; // Start loading the image data in the temporary object
+            tempImg.src = ev.target.result; 
         };
         reader.readAsDataURL(file);
     });
@@ -630,40 +636,28 @@ allNodes.forEach(rect=>{
         e.stopPropagation();
         const rectId = rect.id;
         
-        // 1. Clear the current node
         clearNode(rect);
         
-        // 2. Cascade clear logic
         if(rectId === 'rootRect'){
-            // PER USER REQUEST: Do NOT clear downstream images (topNodes, botNodes). 
-            // The images remain visually, but flow buttons are disabled by updateDownstreamFlows.
-            
+            // Downstream flow buttons disabled
         } else {
-            const topIdx = topNodes.findIndex(n => n.id === rectId);
-            const botIdx = botNodes.findIndex(n => n.id === rectId);
-
+            const topIdx = topNodes.findIndex(n => n.id === rect.id);
             if (topIdx !== -1) {
-                 // If a top node is cleared, clear its dependent bottom node
                  clearNode(botNodes[topIdx]);
-            } else if (botIdx !== -1) {
-                 // If a bottom node is cleared, nothing else needs to be cleared.
-            }
+            } 
         }
         
-        // Update flow button states based on data unavailability
         updateDownstreamFlows(rectId);
     });
 
     saveBtn?.addEventListener('click',e=>{
         e.stopPropagation();
         
-        // Check if the node is empty, if so, nothing to save.
         if (rect.classList.contains('empty')) {
             console.warn(`Cannot save: ${rect.id} is empty.`);
             return;
         }
         
-        // 1. Direct manual upload exists? Save it directly. (This handles all 'uploaded' nodes)
         if (originalFiles[rect.id]) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(originalFiles[rect.id]);
@@ -672,12 +666,8 @@ allNodes.forEach(rect=>{
             return;
         }
         
-        // 2. No manual upload (i.e., it's a generated image)? Trace back to find source and process High Res.
-        
-        // Root Node should be handled by #1 (it's only populated by upload)
         if (rect.id === 'rootRect') return;
 
-        // Top Row (Generated from Root)
         const topIdx = topNodes.findIndex(n => n.id === rect.id);
         if (topIdx !== -1) {
             if (originalFiles['rootRect']) {
@@ -686,17 +676,13 @@ allNodes.forEach(rect=>{
             return;
         }
 
-        // Bottom Row (Generated from Top Channel)
         const botIdx = botNodes.findIndex(n => n.id === rect.id);
         if (botIdx !== -1) {
-            const channelIdx = botIdx; // Channel index is the same as botIdx
-            
-            // If Top Node has manual file, use that as source for grayscale processing
+            const channelIdx = botIdx; 
             const topNode = topNodes[botIdx];
             if (originalFiles[topNode.id]) {
                 processHighResAndSave(originalFiles[topNode.id], 'grayscale', null);
             } 
-            // If Top Node was generated, use the Root and apply BOTH filters (cascaded flow)
             else if (originalFiles['rootRect']) {
                 processHighResAndSave(originalFiles['rootRect'], 'both', channelIdx);
             }
