@@ -6,43 +6,124 @@
 <title>Dark Mode Bezier Layout - Image Processing</title>
 <style>
 :root{--bg:#0b0f13;--panel:#0f1720;--muted:#94a3b8;--accent:#60a5fa;}
-body{margin:0;padding:24px;font-family:Inter,sans-serif;background:linear-gradient(180deg,var(--bg),#061018 120%);color:var(--muted);display:flex;justify-content:center}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:20px;
+  font-family:Inter,sans-serif;
+  background:linear-gradient(180deg,var(--bg),#061018 120%);
+  color:var(--muted);
+  display:flex;
+  justify-content:center;
+  min-height: 100vh;
+}
 .container{max-width:1100px;width:100%}
-.card{background:linear-gradient(180deg,var(--panel),#0b1220);border-radius:12px;padding:18px}
-.top-wrap{display:flex;justify-content:center;margin:40px 0}
-.rect,.node{width:260px;aspect-ratio:3/2;border-radius:12px;background:#1e293b;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:box-shadow 0.3s}
+.card{
+  background:linear-gradient(180deg,var(--panel),#0b1220);
+  border-radius:12px;
+  padding:16px;
+  width: 100%;
+}
+.top-wrap{display:flex;justify-content:center;margin:30px 0}
+.three-row{position:relative;margin:40px 0}
+.row{display:flex;gap:12px;justify-content:space-between}
+.bottom-row{margin-top:30px}
+
+/* Node Styling */
+.rect,.node{
+  width:260px;
+  max-width: 31%;
+  aspect-ratio:3/2;
+  border-radius:12px;
+  background:#1e293b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+  transition:box-shadow 0.3s;
+  flex-shrink: 1;
+}
+/* Only apply blue border if manually uploaded (controlled by JS toggling this class) */
 .rect.uploaded,.node.uploaded{box-shadow:0 0 0 4px rgba(96,165,250,0.6)}
 .rect img,.node img{width:100%;height:100%;object-fit:cover}
-.upload-btn,.trash-btn,.update-btn,.save-btn{position:absolute;border:none;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;z-index:2}
+
+/* Buttons */
+.upload-btn,.trash-btn,.update-btn,.save-btn{
+  position:absolute;
+  border:none;
+  border-radius:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:14px;
+  z-index:10;
+  transition: transform 0.1s, opacity 0.2s;
+}
+.upload-btn:active, .trash-btn:active, .update-btn:active, .save-btn:active {
+    transform: scale(0.95);
+}
+
 .upload-btn{top:4px;left:4px;width:28px;height:28px;background:rgba(96,165,250,0.85);color:#fff}
 .trash-btn{top:4px;right:4px;width:28px;height:28px;background:rgba(248,113,113,0.85);color:#fff}
-.update-btn{bottom:4px;left:4px;background:rgba(250,204,21,0.85);color:#000;padding:6px 12px;border-radius:6px;display:none}
+
+.update-btn{
+  bottom:4px;
+  left:4px;
+  width: 28px;
+  height: 28px;
+  background:rgba(250,204,21,0.9);
+  color:#000;
+  border-radius:4px;
+  display:none; /* Hidden by default */
+  font-size: 16px;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
 .save-btn{bottom:4px;right:4px;width:28px;height:28px;background:rgba(34,197,94,0.85);color:#fff}
-.three-row{position:relative;margin:50px 0}
-.row{display:flex;gap:14px;justify-content:space-between}
-.bottom-row{margin-top:36px}
+
 .three-row svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 input[type='file']{display:none}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  body { padding: 8px; }
+  .card { padding: 10px; }
+  .top-wrap { margin: 16px 0; }
+  .three-row { margin: 20px 0; }
+  .bottom-row { margin-top: 16px; }
+  
+  .row { gap: 6px; }
+  
+  .upload-btn, .trash-btn, .save-btn, .update-btn { width: 24px; height: 24px; font-size: 12px; }
+  
+  .rect, .node {
+    border-radius: 8px;
+    width: 32%; 
+  }
+}
 </style>
 </head>
 <body>
 <div class="container">
 <div class="card">
-<header><h1 style="color:var(--accent);font-size:16px;margin:0">Image Processing Layout</h1></header>
+<header><h1 style="color:var(--accent);font-size:16px;margin:0;text-align:center;">Image Processing Layout</h1></header>
 <section class="top-wrap">
-<div id="rootRect" class="rect"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div id="rootRect" class="rect"><button class="upload-btn" title="Upload">📤</button><button class="trash-btn" title="Clear">🗑️</button><button class="save-btn" title="Save High-Res">💾</button><input type="file" accept="image/*"></div>
 </section>
 <section class="three-row" id="middleSection">
 <svg id="linksSvg" aria-hidden="true"></svg>
 <div class="row" id="topRow">
-<div class="node" id="top1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Channel">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 <div class="row bottom-row" id="bottomRow">
-<div class="node" id="bot1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn" title="Process Grayscale">⬇️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 </section>
 </div>
@@ -53,137 +134,293 @@ const svg=document.getElementById('linksSvg');
 const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
 const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
 const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];
-let compressedImages={};
+
+// Store low-res canvases for display
+let nodeCanvases={};
+// Store original high-res files for saving
 let originalFiles={};
+
 function centerPoint(el){const rect=el.getBoundingClientRect();const parentRect=svg.getBoundingClientRect();return{x:rect.left+rect.width/2-parentRect.left,y:rect.top+rect.height/2-parentRect.top}}
 function makePath(d){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(96,165,250,0.85)');p.setAttribute('stroke-width','8');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');return p}
-function draw(){while(svg.firstChild)svg.removeChild(svg.firstChild);const container=document.getElementById('middleSection');const box=container.getBoundingClientRect();svg.setAttribute('width',box.width);svg.setAttribute('height',box.height);svg.style.width=box.width+'px';svg.style.height=box.height+'px';const root=document.getElementById('rootRect');const rootRect=root.getBoundingClientRect();const svgRect=svg.getBoundingClientRect();const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;const rootY=(rootRect.top+rootRect.height)-svgRect.top;topNodes.forEach(n=>{const c=centerPoint(n);const startX=rootX;const startY=rootY;const endX=c.x;const endY=c.y-(n.getBoundingClientRect().height/2);const cp1x=startX;const cp1y=startY+Math.max(60,box.height*0.14);const cp2x=endX;const cp2y=endY-Math.max(60,box.height*0.14);const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))});for(let i=0;i<topNodes.length;i++){const topC=centerPoint(topNodes[i]);const bC=centerPoint(botNodes[i]);const startX=topC.x;const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;const endX=bC.x;const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;const offset=Math.max(10,(endY-startY)*0.18);const cp1x=startX;const cp1y=startY+offset;const cp2x=endX;const cp2y=endY-offset;const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))}}
+
+function draw(){
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  const container=document.getElementById('middleSection');
+  const box=container.getBoundingClientRect();
+  svg.setAttribute('width',box.width);
+  svg.setAttribute('height',box.height);
+  svg.style.width=box.width+'px';
+  svg.style.height=box.height+'px';
+  
+  const root=document.getElementById('rootRect');
+  const rootRect=root.getBoundingClientRect();
+  const svgRect=svg.getBoundingClientRect();
+  
+  const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;
+  const rootY=(rootRect.top+rootRect.height)-svgRect.top;
+  
+  topNodes.forEach(n=>{
+    const c=centerPoint(n);
+    const startX=rootX;
+    const startY=rootY;
+    const endX=c.x;
+    const endY=c.y-(n.getBoundingClientRect().height/2);
+    const cp1x=startX;
+    const cp1y=startY+Math.max(30,box.height*0.1); 
+    const cp2x=endX;
+    const cp2y=endY-Math.max(30,box.height*0.1);
+    const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+    svg.appendChild(makePath(d))
+  });
+
+  for(let i=0;i<topNodes.length;i++){
+    const topC=centerPoint(topNodes[i]);
+    const bC=centerPoint(botNodes[i]);
+    const startX=topC.x;
+    const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;
+    const endX=bC.x;
+    const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;
+    const offset=Math.max(10,(endY-startY)*0.2);
+    const cp1x=startX;
+    const cp1y=startY+offset;
+    const cp2x=endX;
+    const cp2y=endY-offset;
+    const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+    svg.appendChild(makePath(d))
+  }
+}
+
+function toggleButton(node, show) {
+    const btn=node.querySelector('.update-btn');
+    if(btn) btn.style.display = show ? 'flex' : 'none';
+}
+
+function processHighResAndSave(file, type, channelIdx) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+
+            // Apply Channel Filter
+            if (type === 'channel' || type === 'both') {
+                 // R=0, G=1, B=2
+                for(let i=0; i<data.length; i+=4) {
+                    if (channelIdx !== 0) data[i] = 0;
+                    if (channelIdx !== 1) data[i+1] = 0;
+                    if (channelIdx !== 2) data[i+2] = 0;
+                    data[i+3] = 255;
+                }
+            }
+
+            // Apply Grayscale Filter
+            if (type === 'grayscale' || type === 'both') {
+                for(let i=0; i<data.length; i+=4) {
+                    const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+                    data[i] = avg;
+                    data[i+1] = avg;
+                    data[i+2] = avg;
+                    data[i+3] = 255;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+            
+            canvas.toBlob(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `processed_highres_${Date.now()}.png`;
+                a.click();
+            }, 'image/png');
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
 window.addEventListener('load',draw);
 window.addEventListener('resize',()=>{if(window._drawRaf)cancelAnimationFrame(window._drawRaf);window._drawRaf=requestAnimationFrame(draw)});
 setTimeout(draw,400);
+
 allNodes.forEach(rect=>{
-const input=rect.querySelector('input[type=file]');
-const uploadBtn=rect.querySelector('.upload-btn');
-const trashBtn=rect.querySelector('.trash-btn');
-const saveBtn=rect.querySelector('.save-btn');
-const updateBtn=rect.querySelector('.update-btn');
-const imgEl=document.createElement('img');
-rect.appendChild(imgEl);
-uploadBtn?.addEventListener('click',e=>{e.stopPropagation();input.click()});
-input?.addEventListener('change',e=>{
-const file=e.target.files[0];
-if(!file)return;
-rect.classList.add('uploaded');
-const reader=new FileReader();
-reader.onload=ev=>{imgEl.src=ev.target.result};
-reader.readAsDataURL(file);
-imgEl.onload=()=>{
-const canvas=document.createElement('canvas');
-const ctx=canvas.getContext('2d');
-const maxW=200;
-const scale=Math.min(maxW/imgEl.naturalWidth,maxW/imgEl.naturalHeight,1);
-canvas.width=imgEl.naturalWidth*scale;canvas.height=imgEl.naturalHeight*scale;
-ctx.drawImage(imgEl,0,0,canvas.width,canvas.height);
-imgEl.src=canvas.toDataURL('image/jpeg',0.7);
-compressedImages[rect.id]=canvas;
-originalFiles[rect.id]=file;
-if(rect.id==='rootRect'){
-topNodes.forEach((n,i)=>{
-const btn=n.querySelector('.update-btn');
-btn.style.display='flex';
-if(botNodes[i]) botNodes[i].querySelector('.update-btn').style.display='flex';
-});
-}
-}
-});
-trashBtn?.addEventListener('click',e=>{
-e.stopPropagation();
-imgEl.src='';
-input.value='';
-rect.classList.remove('uploaded');
-delete compressedImages[rect.id];
-delete originalFiles[rect.id];
-if(rect.id==='rootRect'){
-topNodes.forEach((n,i)=>{
-const btn=n.querySelector('.update-btn');
-btn.style.display='none';
-if(botNodes[i]) botNodes[i].querySelector('.update-btn').style.display='none';
-});
-}
-});
-updateBtn?.addEventListener('click',e=>{
-e.stopPropagation();
-if(!compressedImages['rootRect'])return;
-const idx=topNodes.indexOf(rect);
-const botIdx = botNodes[idx];
-if(idx===-1)return;
-const canvas=compressedImages['rootRect'];
-const ctx=canvas.getContext('2d');
-const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-const channelCanvas=document.createElement('canvas');
-channelCanvas.width=canvas.width;
-channelCanvas.height=canvas.height;
-const cctx=channelCanvas.getContext('2d');
-const newData=cctx.createImageData(channelCanvas.width,channelCanvas.height);
-for(let i=0;i<imgData.data.length;i+=4){
-newData.data[i+idx]=imgData.data[i+idx];
-newData.data[i+(idx===0?1:0)]=0;
-newData.data[i+(idx===2?1:2)]=0;
-newData.data[i+3]=255;
-}
-cctx.putImageData(newData,0,0);
-imgEl.src=channelCanvas.toDataURL();
-if(botNodes[idx]) {
-  botNodes[idx].querySelector('.update-btn').style.display='flex';
-  // Desaturate top image for bottom row
-  const bottomImg = botNodes[idx].querySelector('img');
-  const botCanvas = document.createElement('canvas');
-  botCanvas.width = channelCanvas.width;
-  botCanvas.height = channelCanvas.height;
-  const bctx = botCanvas.getContext('2d');
-  bctx.drawImage(channelCanvas,0,0);
-  const bData = bctx.getImageData(0,0,botCanvas.width,botCanvas.height);
-  for(let j=0;j<bData.data.length;j+=4){
-    const avg = (bData.data[j]+bData.data[j+1]+bData.data[j+2])/3;
-    bData.data[j] = bData.data[j+1] = bData.data[j+2] = avg;
-  }
-  bctx.putImageData(bData,0,0);
-  bottomImg.src = botCanvas.toDataURL();
-}
-});
-saveBtn?.addEventListener('click',e=>{
-e.stopPropagation();
-if(!originalFiles[rect.id] && !originalFiles['rootRect'])return;
-let originalFile=originalFiles[rect.id] || originalFiles['rootRect'];
-const imgObj=new Image();
-imgObj.onload=()=>{
-const canvas=document.createElement('canvas');
-canvas.width=imgObj.naturalWidth;
-canvas.height=imgObj.naturalHeight;
-const ctx=canvas.getContext('2d');
-ctx.drawImage(imgObj,0,0);
-const idx=topNodes.indexOf(rect);
-if(idx!==-1){
-const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-for(let i=0;i<imgData.data.length;i+=4){
-let r=0,g=0,b=0;
-if(idx===0) r=imgData.data[i];
-else if(idx===1) g=imgData.data[i+1];
-else if(idx===2) b=imgData.data[i+2];
-imgData.data[i]=r;
-imgData.data[i+1]=g;
-imgData.data[i+2]=b;
-imgData.data[i+3]=255;
-}
-ctx.putImageData(imgData,0,0);
-}
-const a=document.createElement('a');
-a.href=canvas.toDataURL('image/png');
-a.download='processed_'+originalFile.name;
-a.click();
-};
-imgObj.src=URL.createObjectURL(originalFile);
-});
+    const input=rect.querySelector('input[type=file]');
+    const uploadBtn=rect.querySelector('.upload-btn');
+    const trashBtn=rect.querySelector('.trash-btn');
+    const saveBtn=rect.querySelector('.save-btn');
+    const updateBtn=rect.querySelector('.update-btn');
+    
+    const imgEl=document.createElement('img');
+    rect.appendChild(imgEl);
+    
+    uploadBtn?.addEventListener('click',e=>{e.stopPropagation();input.click()});
+    
+    input?.addEventListener('change',e=>{
+        const file=e.target.files[0];
+        if(!file)return;
+        
+        // Manual Upload gets the blue border
+        rect.classList.add('uploaded');
+        
+        const reader=new FileReader();
+        reader.onload=ev=>{imgEl.src=ev.target.result};
+        reader.readAsDataURL(file);
+        
+        imgEl.onload=()=>{
+            // Create low-res preview canvas
+            const canvas=document.createElement('canvas');
+            const ctx=canvas.getContext('2d');
+            const maxW=400; 
+            const scale=Math.min(maxW/imgEl.naturalWidth,maxW/imgEl.naturalHeight,1);
+            canvas.width=imgEl.naturalWidth*scale;canvas.height=imgEl.naturalHeight*scale;
+            ctx.drawImage(imgEl,0,0,canvas.width,canvas.height);
+            imgEl.src=canvas.toDataURL('image/jpeg',0.8);
+            
+            nodeCanvases[rect.id]=canvas;
+            originalFiles[rect.id]=file;
+            
+            // Logic for showing buttons downstream
+            if(rect.id==='rootRect'){
+                topNodes.forEach(n => toggleButton(n, true));
+            } else {
+                const topIdx = topNodes.indexOf(rect);
+                if (topIdx !== -1 && botNodes[topIdx]) {
+                    // If a top node changed manually, show button on bottom node
+                    toggleButton(botNodes[topIdx], true);
+                }
+            }
+        }
+    });
+
+    trashBtn?.addEventListener('click',e=>{
+        e.stopPropagation();
+        imgEl.src='';
+        input.value='';
+        rect.classList.remove('uploaded');
+        delete nodeCanvases[rect.id];
+        delete originalFiles[rect.id];
+        
+        if(rect.id==='rootRect'){
+            topNodes.forEach(n => toggleButton(n, false));
+        } else {
+            const topIdx = topNodes.indexOf(rect);
+            if (topIdx !== -1 && botNodes[topIdx]) {
+                 toggleButton(botNodes[topIdx], false);
+            }
+        }
+        toggleButton(rect, false);
+    });
+
+    updateBtn?.addEventListener('click',e=>{
+        e.stopPropagation();
+        
+        let sourceCanvas = null;
+        let isTopRow = false;
+        let topIdx = topNodes.indexOf(rect);
+        
+        if (topIdx !== -1) {
+            sourceCanvas = nodeCanvases['rootRect'];
+            isTopRow = true;
+        } else {
+            const botIdx = botNodes.indexOf(rect);
+            if (botIdx !== -1) {
+                sourceCanvas = nodeCanvases[topNodes[botIdx].id];
+                topIdx = botIdx;
+            }
+        }
+        
+        if(!sourceCanvas) return;
+        
+        const ctx=sourceCanvas.getContext('2d');
+        const imgData=ctx.getImageData(0,0,sourceCanvas.width,sourceCanvas.height);
+        
+        const newCanvas=document.createElement('canvas');
+        newCanvas.width=sourceCanvas.width;
+        newCanvas.height=sourceCanvas.height;
+        const nctx=newCanvas.getContext('2d');
+        const newData=nctx.createImageData(newCanvas.width,newCanvas.height);
+        
+        if (isTopRow) {
+            // Process RGB Channels
+            for(let i=0;i<imgData.data.length;i+=4){
+                newData.data[i+topIdx]=imgData.data[i+topIdx];
+                newData.data[i+(topIdx===0?1:0)]=0; 
+                newData.data[i+(topIdx===2?1:2)]=0;
+                newData.data[i+3]=255; 
+            }
+            nctx.putImageData(newData,0,0);
+            imgEl.src=newCanvas.toDataURL();
+            nodeCanvases[rect.id] = newCanvas;
+            
+            // Hide own button
+            toggleButton(rect, false);
+            
+            // Show button for next row
+            if (botNodes[topIdx]) {
+                toggleButton(botNodes[topIdx], true);
+            }
+        } else {
+            // Process Grayscale
+             for(let j=0;j<imgData.data.length;j+=4){
+                const avg = (imgData.data[j]+imgData.data[j+1]+imgData.data[j+2])/3;
+                newData.data[j] = avg;
+                newData.data[j+1] = avg;
+                newData.data[j+2] = avg;
+                newData.data[j+3] = 255;
+            }
+            nctx.putImageData(newData,0,0);
+            imgEl.src=newCanvas.toDataURL();
+            nodeCanvases[rect.id] = newCanvas;
+            
+            toggleButton(rect, false);
+        }
+    });
+
+    saveBtn?.addEventListener('click',e=>{
+        e.stopPropagation();
+        
+        // 1. Direct manual upload exists? Save it directly.
+        if (originalFiles[rect.id]) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(originalFiles[rect.id]);
+            a.download = originalFiles[rect.id].name;
+            a.click();
+            return;
+        }
+        
+        // 2. No manual upload? Trace back to find source and process High Res.
+        
+        // Root Node (Already handled above if file exists, if not, nothing to save)
+        if (rect.id === 'rootRect') return;
+
+        // Top Row
+        const topIdx = topNodes.indexOf(rect);
+        if (topIdx !== -1) {
+            if (originalFiles['rootRect']) {
+                processHighResAndSave(originalFiles['rootRect'], 'channel', topIdx);
+            }
+            return;
+        }
+
+        // Bottom Row
+        const botIdx = botNodes.indexOf(rect);
+        if (botIdx !== -1) {
+            // Check if Top Node has manual file
+            const topNode = topNodes[botIdx];
+            if (originalFiles[topNode.id]) {
+                processHighResAndSave(originalFiles[topNode.id], 'grayscale', null);
+            } else if (originalFiles['rootRect']) {
+                // If not, use Root and apply Both filters
+                processHighResAndSave(originalFiles['rootRect'], 'both', botIdx);
+            }
+        }
+    });
 });
 })();
 </script>
