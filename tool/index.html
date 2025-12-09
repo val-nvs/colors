@@ -16,7 +16,7 @@ body{margin:0;padding:24px;font-family:Inter,sans-serif;background:linear-gradie
 .upload-btn,.trash-btn,.update-btn,.save-btn{position:absolute;border:none;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;z-index:2}
 .upload-btn{top:4px;left:4px;width:28px;height:28px;background:rgba(96,165,250,0.85);color:#fff}
 .trash-btn{top:4px;right:4px;width:28px;height:28px;background:rgba(248,113,113,0.85);color:#fff}
-.update-btn{top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(250,204,21,0.85);color:#000;padding:6px 12px;border-radius:6px;display:none}
+.update-btn{bottom:4px;left:4px;background:rgba(250,204,21,0.85);color:#000;padding:6px 12px;border-radius:6px;display:none}
 .save-btn{bottom:4px;right:4px;width:28px;height:28px;background:rgba(34,197,94,0.85);color:#fff}
 .three-row{position:relative;margin:50px 0}
 .row{display:flex;gap:14px;justify-content:space-between}
@@ -30,19 +30,19 @@ input[type='file']{display:none}
 <div class="card">
 <header><h1 style="color:var(--accent);font-size:16px;margin:0">Image Processing Layout</h1></header>
 <section class="top-wrap">
-<div id="rootRect" class="rect"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div id="rootRect" class="rect"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </section>
 <section class="three-row" id="middleSection">
 <svg id="linksSvg" aria-hidden="true"></svg>
 <div class="row" id="topRow">
-<div class="node" id="top1"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="update-btn">Update</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top2"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="update-btn">Update</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="top3"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="update-btn">Update</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="top3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 <div class="row bottom-row" id="bottomRow">
-<div class="node" id="bot1"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot2"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
-<div class="node" id="bot3"><button class="upload-btn">+</button><button class="trash-btn">🗑</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot1"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot2"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
+<div class="node" id="bot3"><button class="upload-btn">📤</button><button class="trash-btn">🗑️</button><button class="update-btn">🔄</button><button class="save-btn">💾</button><input type="file" accept="image/*"></div>
 </div>
 </section>
 </div>
@@ -52,12 +52,12 @@ input[type='file']{display:none}
 const svg=document.getElementById('linksSvg');
 const allNodes=Array.from(document.querySelectorAll('.rect,.node'));
 const topNodes=[document.getElementById('top1'),document.getElementById('top2'),document.getElementById('top3')];
+const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];
 let compressedImages={};
 let originalFiles={};
 function centerPoint(el){const rect=el.getBoundingClientRect();const parentRect=svg.getBoundingClientRect();return{x:rect.left+rect.width/2-parentRect.left,y:rect.top+rect.height/2-parentRect.top}}
 function makePath(d){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(96,165,250,0.85)');p.setAttribute('stroke-width','8');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');return p}
-function draw(){while(svg.firstChild)svg.removeChild(svg.firstChild);const container=document.getElementById('middleSection');const box=container.getBoundingClientRect();svg.setAttribute('width',box.width);svg.setAttribute('height',box.height);svg.style.width=box.width+'px';svg.style.height=box.height+'px';const root=document.getElementById('rootRect');const botNodes=[document.getElementById('bot1'),document.getElementById('bot2'),document.getElementById('bot3')];const rootRect=root.getBoundingClientRect();const svgRect=svg.getBoundingClientRect();const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;const rootY=(rootRect.top+rootRect.height)-svgRect.top;topNodes.forEach(n=>{const c=centerPoint(n);const startX=rootX;const startY=rootY;const endX=c.x;const endY=c.y-(n.getBoundingClientRect().height/2);const cp1x=startX;const cp1y=startY+Math.max(60,box.height*0.14);const cp2x=endX;const cp2y=endY-Math.max(60,box.height*0.14);const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))});for(let i=0;i<topNodes.length;i++){const topC=centerPoint(topNodes[i]);const botC=centerPoint(botNodes[i]);const startX=topC.x;const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;const endX=botC.x;const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;const offset=Math.max(10,(endY-startY)*0.18);const cp1x=startX;const cp1y=startY+offset;const cp2x=endX;const cp2y=endY-offset;const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))}
-}
+function draw(){while(svg.firstChild)svg.removeChild(svg.firstChild);const container=document.getElementById('middleSection');const box=container.getBoundingClientRect();svg.setAttribute('width',box.width);svg.setAttribute('height',box.height);svg.style.width=box.width+'px';svg.style.height=box.height+'px';const root=document.getElementById('rootRect');const rootRect=root.getBoundingClientRect();const svgRect=svg.getBoundingClientRect();const rootX=(rootRect.left+rootRect.width/2)-svgRect.left;const rootY=(rootRect.top+rootRect.height)-svgRect.top;topNodes.forEach(n=>{const c=centerPoint(n);const startX=rootX;const startY=rootY;const endX=c.x;const endY=c.y-(n.getBoundingClientRect().height/2);const cp1x=startX;const cp1y=startY+Math.max(60,box.height*0.14);const cp2x=endX;const cp2y=endY-Math.max(60,box.height*0.14);const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))});for(let i=0;i<topNodes.length;i++){const topC=centerPoint(topNodes[i]);const bC=centerPoint(botNodes[i]);const startX=topC.x;const startY=topNodes[i].getBoundingClientRect().bottom-svgRect.top;const endX=bC.x;const endY=botNodes[i].getBoundingClientRect().top-svgRect.top;const offset=Math.max(10,(endY-startY)*0.18);const cp1x=startX;const cp1y=startY+offset;const cp2x=endX;const cp2y=endY-offset;const d=`M ${startX},${startY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;svg.appendChild(makePath(d))}}
 window.addEventListener('load',draw);
 window.addEventListener('resize',()=>{if(window._drawRaf)cancelAnimationFrame(window._drawRaf);window._drawRaf=requestAnimationFrame(draw)});
 setTimeout(draw,400);
@@ -88,7 +88,11 @@ imgEl.src=canvas.toDataURL('image/jpeg',0.7);
 compressedImages[rect.id]=canvas;
 originalFiles[rect.id]=file;
 if(rect.id==='rootRect'){
-topNodes.forEach(n=>{n.querySelector('.update-btn').style.display='flex'});
+topNodes.forEach((n,i)=>{
+const btn=n.querySelector('.update-btn');
+btn.style.display='flex';
+if(botNodes[i]) botNodes[i].querySelector('.update-btn').style.display='flex';
+});
 }
 }
 });
@@ -100,13 +104,18 @@ rect.classList.remove('uploaded');
 delete compressedImages[rect.id];
 delete originalFiles[rect.id];
 if(rect.id==='rootRect'){
-topNodes.forEach(n=>{n.querySelector('.update-btn').style.display='none'});
+topNodes.forEach((n,i)=>{
+const btn=n.querySelector('.update-btn');
+btn.style.display='none';
+if(botNodes[i]) botNodes[i].querySelector('.update-btn').style.display='none';
+});
 }
 });
 updateBtn?.addEventListener('click',e=>{
 e.stopPropagation();
 if(!compressedImages['rootRect'])return;
 const idx=topNodes.indexOf(rect);
+const botIdx = botNodes[idx];
 if(idx===-1)return;
 const canvas=compressedImages['rootRect'];
 const ctx=canvas.getContext('2d');
@@ -124,6 +133,23 @@ newData.data[i+3]=255;
 }
 cctx.putImageData(newData,0,0);
 imgEl.src=channelCanvas.toDataURL();
+if(botNodes[idx]) {
+  botNodes[idx].querySelector('.update-btn').style.display='flex';
+  // Desaturate top image for bottom row
+  const bottomImg = botNodes[idx].querySelector('img');
+  const botCanvas = document.createElement('canvas');
+  botCanvas.width = channelCanvas.width;
+  botCanvas.height = channelCanvas.height;
+  const bctx = botCanvas.getContext('2d');
+  bctx.drawImage(channelCanvas,0,0);
+  const bData = bctx.getImageData(0,0,botCanvas.width,botCanvas.height);
+  for(let j=0;j<bData.data.length;j+=4){
+    const avg = (bData.data[j]+bData.data[j+1]+bData.data[j+2])/3;
+    bData.data[j] = bData.data[j+1] = bData.data[j+2] = avg;
+  }
+  bctx.putImageData(bData,0,0);
+  bottomImg.src = botCanvas.toDataURL();
+}
 });
 saveBtn?.addEventListener('click',e=>{
 e.stopPropagation();
