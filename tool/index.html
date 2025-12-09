@@ -117,8 +117,9 @@ channelCanvas.height=canvas.height;
 const cctx=channelCanvas.getContext('2d');
 const newData=cctx.createImageData(channelCanvas.width,channelCanvas.height);
 for(let i=0;i<imgData.data.length;i+=4){
-const val=imgData.data[i+idx];
-newData.data[i]=newData.data[i+1]=newData.data[i+2]=val;
+newData.data[i+idx]=imgData.data[i+idx];
+newData.data[i+(idx===0?1:0)]=0;
+newData.data[i+(idx===2?1:2)]=0;
 newData.data[i+3]=255;
 }
 cctx.putImageData(newData,0,0);
@@ -135,13 +136,17 @@ canvas.width=imgObj.naturalWidth;
 canvas.height=imgObj.naturalHeight;
 const ctx=canvas.getContext('2d');
 ctx.drawImage(imgObj,0,0);
-// Apply same channel filter if it's a top row node
 const idx=topNodes.indexOf(rect);
 if(idx!==-1){
 const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
 for(let i=0;i<imgData.data.length;i+=4){
-const val=imgData.data[i+idx];
-imgData.data[i]=imgData.data[i+1]=imgData.data[i+2]=val;
+let r=0,g=0,b=0;
+if(idx===0) r=imgData.data[i];
+else if(idx===1) g=imgData.data[i+1];
+else if(idx===2) b=imgData.data[i+2];
+imgData.data[i]=r;
+imgData.data[i+1]=g;
+imgData.data[i+2]=b;
 imgData.data[i+3]=255;
 }
 ctx.putImageData(imgData,0,0);
