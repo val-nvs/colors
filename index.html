@@ -367,6 +367,12 @@ input[type="range"]:hover::-webkit-slider-thumb {
 #processingCanvas {
   display: none;
 }
+
+#mainCanvas {
+  display: none;
+  width: 100%;
+  border-radius: 0.2rem;
+}
 </style>
 </head>
 <body>
@@ -458,10 +464,12 @@ input[type="range"]:hover::-webkit-slider-thumb {
   </div>
   <div id="mainImgBox">
     <img id="mainImg" alt="Main Image" src="black.png">
+    <canvas id="mainCanvas"></canvas>
   </div>
   <div id="buttonBox" class="splitView">
     <button id="btnUpload" class="button"><span class="material-symbols-outlined">upload</span><br>Upload</button>
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button id="btnCamera" class="button"><span class="material-symbols-outlined">photo_camera</span><br>Camera</button>
     <button id="btnWB" class="button"><span class="material-symbols-outlined">brightness_6</span><br>WB</button>
     <div id="buttonGroup">
       <button id="btnG" class="button"><span class="material-symbols-outlined">visibility</span><br>G</button>
@@ -789,8 +797,217 @@ function extractColorChannel(ctx, canvas, channel) {
   ctx.putImageData(imageData, 0, 0);
 }
 
+// ---------- WebGL camera pipeline ----------
+let cameraActive = false;
+let videoEl = null;
+let glCanvas = null;
+let gl = null;
+let glProgram = null;
+let glTexture = null;
+let glUniforms = {};
+let rafId = null;
+
+const VERT_SRC = `
+  attribute vec2 a_pos;
+  varying vec2 v_uv;
+  void main() {
+    v_uv = vec2((a_pos.x + 1.0) * 0.5, 1.0 - (a_pos.y + 1.0) * 0.5);
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+  }
+`;
+
+const FRAG_SRC = `
+  precision highp float;
+  uniform sampler2D u_texture;
+  uniform vec3 u_oL;
+  uniform vec3 u_oM;
+  uniform vec3 u_oS;
+  uniform vec3 u_wbGain;
+  uniform float u_wbEnabled;
+  uniform int u_channelMode;
+  varying vec2 v_uv;
+  void main() {
+    vec3 c = texture2D(u_texture, v_uv).rgb;
+    if (u_wbEnabled > 0.5) c *= u_wbGain;
+    float L = c.r;
+    float M;
+    if (u_channelMode == 0) M = c.g;
+    else if (u_channelMode == 1) M = c.b;
+    else M = (c.g + c.b) * 0.5;
+    float S = (L + M) * 0.5;
+    vec3 result = u_oL * L + u_oM * M + u_oS * S;
+    gl_FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
+  }
+`;
+
+function compileShader(type, src) {
+  const sh = gl.createShader(type);
+  gl.shaderSource(sh, src);
+  gl.compileShader(sh);
+  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+    const log = gl.getShaderInfoLog(sh);
+    gl.deleteShader(sh);
+    throw new Error('Shader compile failed: ' + log);
+  }
+  return sh;
+}
+
+function initGL() {
+  if (gl) return true;
+  glCanvas = document.getElementById('mainCanvas');
+  gl = glCanvas.getContext('webgl', { preserveDrawingBuffer: true });
+  if (!gl) { alert('WebGL is not supported on this device.'); return false; }
+
+  const vs = compileShader(gl.VERTEX_SHADER, VERT_SRC);
+  const fs = compileShader(gl.FRAGMENT_SHADER, FRAG_SRC);
+  glProgram = gl.createProgram();
+  gl.attachShader(glProgram, vs);
+  gl.attachShader(glProgram, fs);
+  gl.linkProgram(glProgram);
+  if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+    throw new Error('Program link failed: ' + gl.getProgramInfoLog(glProgram));
+  }
+  gl.useProgram(glProgram);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(glProgram, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  glTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, glTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  glUniforms = {
+    oL: gl.getUniformLocation(glProgram, 'u_oL'),
+    oM: gl.getUniformLocation(glProgram, 'u_oM'),
+    oS: gl.getUniformLocation(glProgram, 'u_oS'),
+    wbGain: gl.getUniformLocation(glProgram, 'u_wbGain'),
+    wbEnabled: gl.getUniformLocation(glProgram, 'u_wbEnabled'),
+    channelMode: gl.getUniformLocation(glProgram, 'u_channelMode'),
+  };
+  return true;
+}
+
+function computeWBGain() {
+  const v = +document.getElementById('wbSlider').value;
+  const M0 = 1000000 / 6500;
+  const deltaM = v / 100 * M0 * 0.99;
+  const Mt = M0 + deltaM;
+  const K = 1000000 / Mt;
+  document.getElementById('whiteBalanceVal').textContent = (deltaM >= 0 ? '+' : '') + Math.round(deltaM) + 'μ';
+  return kelvinToRgb(K);
+}
+
+function renderGLFrame(source, w, h) {
+  if (!gl) return;
+  if (glCanvas.width !== w) glCanvas.width = w;
+  if (glCanvas.height !== h) glCanvas.height = h;
+  gl.viewport(0, 0, w, h);
+
+  gl.bindTexture(gl.TEXTURE_2D, glTexture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  try {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+  } catch (e) {
+    return;
+  }
+
+  const { oL, oM, oS } = computeOverlays();
+  gl.uniform3f(glUniforms.oL, oL.r/255, oL.g/255, oL.b/255);
+  gl.uniform3f(glUniforms.oM, oM.r/255, oM.g/255, oM.b/255);
+  gl.uniform3f(glUniforms.oS, oS.r/255, oS.g/255, oS.b/255);
+
+  const wb = computeWBGain();
+  gl.uniform3f(glUniforms.wbGain, wb.r/255, wb.g/255, wb.b/255);
+  gl.uniform1f(glUniforms.wbEnabled, btnWB ? 1.0 : 0.0);
+
+  let modeInt = 0;
+  if (channelMode === 'B') modeInt = 1;
+  else if (channelMode === 'GB') modeInt = 2;
+  gl.uniform1i(glUniforms.channelMode, modeInt);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+function renderLoop() {
+  if (!cameraActive) return;
+  if (videoEl && videoEl.readyState >= 2 && videoEl.videoWidth > 0) {
+    renderGLFrame(videoEl, videoEl.videoWidth, videoEl.videoHeight);
+  }
+  rafId = requestAnimationFrame(renderLoop);
+}
+
+function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Camera API not available. Use HTTPS or localhost.');
+    return;
+  }
+  if (!initGL()) return;
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false,
+  }).then(stream => {
+    if (!videoEl) {
+      videoEl = document.createElement('video');
+      videoEl.autoplay = true;
+      videoEl.playsInline = true;
+      videoEl.muted = true;
+    }
+    videoEl.srcObject = stream;
+    videoEl.onloadedmetadata = () => {
+      videoEl.play();
+      cameraActive = true;
+      document.getElementById('mainImg').style.display = 'none';
+      document.getElementById('mainCanvas').style.display = 'block';
+      setCameraButtonState(true);
+      renderLoop();
+    };
+  }).catch(err => {
+    alert('Camera error: ' + (err && err.message ? err.message : err));
+  });
+}
+
+function stopCamera() {
+  cameraActive = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  if (videoEl && videoEl.srcObject) {
+    videoEl.srcObject.getTracks().forEach(t => t.stop());
+    videoEl.srcObject = null;
+  }
+  document.getElementById('mainImg').style.display = '';
+  document.getElementById('mainCanvas').style.display = 'none';
+  setCameraButtonState(false);
+}
+
+function setCameraButtonState(on) {
+  const btn = document.getElementById('btnCamera');
+  if (!btn) return;
+  if (on) {
+    btn.style.backgroundColor = '#c9d1d9';
+    btn.style.borderColor = '#c9d1d9';
+    btn.style.color = '#0D1117';
+    btn.style.boxShadow = '0 0 0.3rem rgba(201, 209, 217, 0.5)';
+  } else {
+    btn.style.backgroundColor = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.style.boxShadow = '';
+  }
+}
+
 // Update all displays
 function updateAllDisplays() {
+  // Always refresh the displayed hue values so sliders feel live in any mode
+  computeOverlays();
+  // In camera mode the rAF loop handles rendering using current slider state
+  if (cameraActive) return;
   if (!currentImageSrc) return;
   
   // Clear cache if image source changed
@@ -1053,26 +1270,34 @@ uploadBox.addEventListener("click", () => {
   fileInputSample.click();
 });
 
+document.getElementById("btnCamera").addEventListener("click", () => {
+  if (cameraActive) stopCamera(); else startCamera();
+});
+
+function loadImageSrc(src) {
+  if (cameraActive) stopCamera();
+  currentImageSrc = src;
+  clearImageCache();
+  updateAllDisplays();
+}
+
 fileInput.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
-  currentImageSrc = URL.createObjectURL(file);
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(URL.createObjectURL(file));
 });
 
 fileInputSample.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
-  currentImageSrc = URL.createObjectURL(file);
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(URL.createObjectURL(file));
 });
 
 // Save button
 document.getElementById("btnSave").addEventListener("click", () => {
   const mainImg = document.getElementById("mainImg");
-  if (mainImg.src) {
+  const haveSource = cameraActive || !!mainImg.src;
+  if (haveSource) {
     // Get displayed values from top of page
     const mode = channelMode === 'GB' ? 'C' : channelMode;
     const longConeRaw = document.getElementById("longConeHueVal").textContent.replace('°', '');
@@ -1101,10 +1326,10 @@ document.getElementById("btnSave").addEventListener("click", () => {
     }
     
     filename += '.png';
-    
+
     const link = document.createElement("a");
     link.download = filename;
-    link.href = mainImg.src;
+    link.href = cameraActive ? document.getElementById('mainCanvas').toDataURL('image/png') : mainImg.src;
     link.click();
   }
 });
@@ -1153,45 +1378,31 @@ function endScanAnimation(elementId) {
 
 // Sample image clicks
 document.getElementById("colorCheckerBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("colorCheckerImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("colorCheckerImg").src);
 });
 
 document.getElementById("colorBarsBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("colorBarsImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("colorBarsImg").src);
 });
 
 document.getElementById("circleBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("circleImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("circleImg").src);
 });
 
 document.getElementById("aBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("aImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("aImg").src);
 });
 
 document.getElementById("bBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("bImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("bImg").src);
 });
 
 document.getElementById("cBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("cImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("cImg").src);
 });
 
 document.getElementById("dBox").addEventListener("click", () => {
-  currentImageSrc = document.getElementById("dImg").src;
-  clearImageCache();
-  updateAllDisplays();
+  loadImageSrc(document.getElementById("dImg").src);
 });
 
 // Initialize display values
